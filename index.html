@@ -524,6 +524,8 @@ Dr. Joydip Chandra</span>
             await loadScopusKeyStatus();
         }
         async function leaveOmniWorkspace() {
+            // Clear private, in-memory search data whenever the user signs out.
+            clearWorkspaceSearchState();
             window.omniUser = null;
             state.scopusKeyConfigured = false;
             document.getElementById('app-shell').classList.add('hidden');
@@ -617,7 +619,8 @@ Dr. Joydip Chandra</span>
             displayedResults: [],
             selectedArticles: new Map(),
             activeCitationFormat: 'apa',
-            isLoading: false
+            isLoading: false,
+            searchRequestId: 0
         };
 
         // Render Database Selection Grid
@@ -703,9 +706,40 @@ Dr. Joydip Chandra</span>
         function updateRowField(id, val) { const r = state.queryRows.find(x => x.id === id); if(r) r.field = val; }
         function updateRowValue(id, val) { const r = state.queryRows.find(x => x.id === id); if(r) r.value = val; }
 
-        function resetSearchQuery() {
+        // Clear query inputs, fetched results, filters and citation selections together.
+        // This deliberately does not touch the signed-in account or its server-stored Scopus key.
+        function clearWorkspaceSearchState() {
+            // Invalidate any search request still running so it cannot repopulate cleared results.
+            state.searchRequestId = (state.searchRequestId || 0) + 1;
+            state.isLoading = false;
+            state.searchResults = [];
+            state.displayedResults = [];
+            state.selectedArticles.clear();
             state.queryRows = [{ id: 1, boolean: 'AND', field: 'all', value: '' }];
+
             renderQueryRows();
+            document.getElementById('filter-year-from').value = '';
+            document.getElementById('filter-year-to').value = '';
+            document.getElementById('filter-peer-reviewed').checked = false;
+            document.querySelectorAll('.filter-doctype').forEach(cb => cb.checked = true);
+            document.getElementById('sort-results-select').value = 'relevance';
+            renderLanguageFilters();
+
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('results-list').innerHTML = '';
+            document.getElementById('results-count-summary').innerHTML = `
+                Ready to search across <span class="text-sky-400 font-bold">10 global open-access repositories</span>.
+            `;
+            document.getElementById('empty-state').classList.remove('hidden');
+            const citationSummary = document.getElementById('citation-selected-summary');
+            if (citationSummary) citationSummary.textContent = '0 article(s) selected';
+            const citationText = document.getElementById('citation-text-box');
+            if (citationText) citationText.textContent = 'No items currently selected. Please check article checkboxes in search results to generate references.';
+            refreshCitationExportState(false);
+        }
+
+        function resetSearchQuery() {
+            clearWorkspaceSearchState();
         }
 
         // External Search Redirection Handler
@@ -1004,6 +1038,7 @@ Dr. Joydip Chandra</span>
          * Search Execution & Result Orchestration
          */
         async function executeScholarlySearch() {
+            const requestId = state.searchRequestId = (state.searchRequestId || 0) + 1;
             const primaryTerm = state.queryRows
                 .map(r => r.value.trim())
                 .filter(Boolean)
@@ -1031,6 +1066,7 @@ Dr. Joydip Chandra</span>
 
             try {
                 const resultsArrays = await Promise.all(fetchPromises);
+                if (requestId !== state.searchRequestId || !window.omniUser) return;
                 state.searchResults = deduplicateResults(resultsArrays.flat());
                 await logOmniActivity('search', { resources: queriedResources, result_count: state.searchResults.length });
                 state.selectedArticles.clear();
@@ -1053,6 +1089,7 @@ Dr. Joydip Chandra</span>
                     applyClientFilters();
                 }
             } catch (error) {
+                if (requestId !== state.searchRequestId) return;
                 state.isLoading = false;
                 document.getElementById('loading-state').classList.add('hidden');
                 console.error('Search orchestration failure:', error);
