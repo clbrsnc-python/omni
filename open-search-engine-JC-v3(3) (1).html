@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-sky-50 text-slate-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniScholar - Global Open Access Academic Search & Citation Engine</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom UI Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #e0f2fe; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+         .glass-panel { background: rgba(255, 255, 255, 0.86); backdrop-filter: blur(12px); }
+        .glow-effect { box-shadow: 0 0 25px -5px rgba(14, 165, 233, 0.15); }
+        
+        /* Native DOM Virtualization for silky smooth scrolling with 300+ items */
+        .result-card-virtual {
+            content-visibility: auto;
+            contain-intrinsic-size: 0 160px;
+        }
+
+        /* Light-blue research workspace palette: black + violet + teal accents */
+        body { background: #e0f2fe !important; color: #111827 !important; }
+        .bg-slate-950 { background-color: #f8fbff !important; }
+        .bg-slate-900, .bg-slate-900\/80, .bg-slate-900\/90, .bg-slate-900\/50, .bg-slate-900\/40 { background-color: #ffffff !important; }
+        .bg-slate-800, .bg-slate-800\/80 { background-color: #eef2ff !important; }
+        .text-slate-100, .text-slate-200, .text-slate-300 { color: #111827 !important; }
+        .text-slate-400 { color: #374151 !important; }
+        .text-slate-500 { color: #4b5563 !important; }
+        .text-sky-400, .text-sky-300 { color: #0f766e !important; }
+        .text-emerald-400 { color: #0f766e !important; }
+        .border-slate-800, .border-slate-800\/80, .border-slate-800\/90 { border-color: #cbd5e1 !important; }
+        .border-slate-700, .border-slate-700\/80 { border-color: #a5b4fc !important; }
+        .text-indigo-300 { color: #6d28d9 !important; }
+        .text-purple-400 { color: #7c3aed !important; }
+        input, select { color: #111827 !important; }
+        .placeholder-slate-500::placeholder { color: #64748b !important; }
+
+        /* Refined light-blue UI: keep the header and action controls crisp/opaque. */
+        header { background: rgba(255,255,255,0.98) !important; border-color: #99f6e4 !important; }
+        header .bg-clip-text {
+            background-image: linear-gradient(90deg, #0f766e, #6d28d9) !important;
+            -webkit-background-clip: text !important; background-clip: text !important;
+        }
+        header .text-slate-400 { color: #334155 !important; }
+        header .bg-slate-800\/80 { background-color: #f0fdfa !important; }
+        .header-scopus-btn { background: #ffffff !important; color: #111827 !important; border-color: #99f6e4 !important; }
+        .header-scopus-btn:hover { background: #ecfeff !important; }
+        .header-citation-btn { background: linear-gradient(90deg, #0f766e, #6d28d9) !important; color: #ffffff !important; box-shadow: 0 8px 20px rgba(109,40,217,.18) !important; }
+
+        /* Database selector tiles */
+        .database-tile { background: #ffffff !important; border-color: #cbd5e1 !important; }
+        .database-tile.database-active { background: linear-gradient(135deg, #ecfeff, #f5f3ff) !important; border-color: #14b8a6 !important; box-shadow: 0 2px 8px rgba(15,118,110,.08); }
+        .database-tile:hover { border-color: #7c3aed !important; background: #f5f3ff !important; }
+        .database-tile .database-icon { color: #6d28d9 !important; }
+        .database-tile.database-active .database-icon { color: #0f766e !important; }
+        .database-select-all { color: #6d28d9 !important; font-weight: 700 !important; }
+        .database-select-all:hover { color: #0f766e !important; }
+        .database-deselect-all { color: #475569 !important; }
+
+        /* Result selection control */
+        .select-all-results-control { background: #f5f3ff !important; border-color: #c4b5fd !important; }
+        .select-all-results-control label { color: #4c1d95 !important; font-weight: 700 !important; }
+        .select-all-results-control input { accent-color: #6d28d9; }
+        .select-all-results-control:hover { background: #ede9fe !important; border-color: #8b5cf6 !important; }
+
+        /* External search buttons */
+        .external-search-bar { background: #f8fafc !important; border-color: #99f6e4 !important; }
+        .external-search-label { color: #0f766e !important; }
+        .external-search-btn { background: #ffffff !important; color: #111827 !important; border-color: #c4b5fd !important; }
+        .external-search-btn:hover { background: #f5f3ff !important; border-color: #7c3aed !important; color: #4c1d95 !important; }
+
+        /* Citation/export modal stays readable on the light workspace. */
+        #citation-modal > div, #scopus-modal > div { background: #ffffff !important; border-color: #cbd5e1 !important; }
+        #citation-text-box { background: #f8fafc !important; color: #111827 !important; border-color: #cbd5e1 !important; }
+        .cit-tab.cit-active { background: #ede9fe !important; color: #5b21b6 !important; border-color: #a78bfa !important; }
+        .cit-tab.cit-inactive { background: #f0fdfa !important; color: #475569 !important; }
+
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-sky-50 text-slate-900 antialiased selection:bg-sky-200 selection:text-slate-900">
+
+    <header class="border-b border-slate-800/80 bg-slate-900/90 sticky top-0 z-40 backdrop-blur-md shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-sky-500 to-indigo-600 p-2.5 rounded-xl text-white shadow-lg shadow-sky-500/20">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-indigo-300 to-white">OmniScholar</span>
+                        <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            100% Legal Open Access
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-medium hidden sm:block">Universal Scholarly Search & Citation Engine</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleScopusModal()" class="header-scopus-btn flex items-center space-x-2 px-3 py-1.5 text-xs font-medium rounded-xl transition">
+                    <i class="fa-solid fa-key text-amber-400"></i>
+                    <span id="scopus-status-text">Scopus API Key</span>
+                </button>
+                <button onclick="toggleCitationModal()" class="header-citation-btn relative flex items-center space-x-2 px-4 py-1.5 text-xs font-semibold rounded-xl transition transform active:scale-95">
+                    <i class="fa-solid fa-quote-right"></i>
+                    <span>Citations & Export</span>
+                    <span id="selected-count-badge" class="ml-1 px-2 py-0.5 bg-white text-sky-900 rounded-full text-[10px] font-bold">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+        <!-- Target Repositories & Search Engines Selection Box -->
+        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 shadow-xl glass-panel">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-800/60">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-database text-sky-400 text-sm"></i>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Target Databases & Open Repositories</h3>
+                    <span class="text-[11px] text-slate-500">(Direct API Connectivity)</span>
+                </div>
+                <div class="flex items-center space-x-3 text-xs">
+                    <button onclick="selectAllSources(true)" class="database-select-all transition flex items-center gap-1">
+                        <i class="fa-solid fa-check-double text-[10px]"></i> Select All
+                    </button>
+                    <span class="text-slate-700">|</span>
+                    <button onclick="selectAllSources(false)" class="database-deselect-all hover:text-slate-700 transition">Deselect All</button>
+                </div>
+            </div>
+
+            <!-- Database Checkboxes Container -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5" id="source-checkbox-container">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800/90 rounded-2xl p-5 shadow-2xl glass-panel glow-effect">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-sky-400"></i> Advanced Query Builder
+                </span>
+                <span class="text-[11px] text-slate-500">Supports Boolean Logic (AND, OR, NOT) & Field Scoping</span>
+            </div>
+
+            <!-- Query Input Rows Container -->
+            <div id="query-rows-container" class="space-y-2.5">
+                <!-- Dynamically populated via renderQueryRows() -->
+            </div>
+
+            <!-- Query Toolbar & Controls -->
+            <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-2">
+                    <button onclick="addQueryRow()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700/80 flex items-center space-x-1.5 transition">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
+                        <span>Add Boolean Row</span>
+                    </button>
+                    <button onclick="resetSearchQuery()" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                        Clear Fields
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="executeScholarlySearch()" class="px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-sky-500 via-indigo-600 to-purple-600 hover:from-sky-400 hover:to-purple-500 text-white shadow-lg shadow-sky-500/25 flex items-center space-x-2 transition transform active:scale-95">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>Execute Multi-Database Search</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 👉 INTEGRATED EXTERNAL SEARCH ENGINES BAR -->
+        <div class="external-search-bar p-4 rounded-xl border flex flex-wrap items-center justify-between gap-4 glass-panel shadow-md">
+            <div class="external-search-label flex items-center space-x-2 font-semibold text-xs uppercase tracking-wider">
+                <i class="fa-solid fa-external-link-alt text-amber-500"></i>
+                <span>Open Search Query Directly in External Engines:</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+                <!-- Google Scholar -->
+                <button onclick="openExternalSearch('scholar')" class="external-search-btn px-3.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                    <span>🎓</span>
+                    <span>Google Scholar</span>
+                </button>
+
+                <!-- BASE Search -->
+                <button onclick="openExternalSearch('base')" class="external-search-btn px-3.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                    <span>🏛️</span>
+                    <span>BASE Search</span>
+                </button>
+
+                <!-- Shodhganga ETDs -->
+                <button onclick="openExternalSearch('shodhganga')" class="external-search-btn px-3.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                    <span>💾</span>
+                    <span>Shodhganga ETDs</span>
+                </button>
+
+                <!-- WorldCat -->
+                <button onclick="openExternalSearch('worldcat')" class="external-search-btn px-3.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                    <span>🌐</span>
+                    <span>WorldCat</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
+
+            <!-- Faceted Filter Sidebar -->
+            <aside class="lg:col-span-1 space-y-5">
+                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 sticky top-20 glass-panel shadow-lg">
+                    <div class="flex items-center justify-between mb-4 pb-2.5 border-b border-slate-800/80">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-filter text-sky-400"></i> Faceted Refinement
+                        </h4>
+                        <button onclick="clearAllFilters()" class="text-[11px] text-sky-400 hover:underline">Reset Filters</button>
+                    </div>
+
+                    <!-- Year Range Filter -->
+                    <div class="space-y-2 mb-5">
+                        <label class="text-xs font-bold text-slate-400 block">Publication Year</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="filter-year-from" placeholder="From (e.g. 2018)" min="1800" max="2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none">
+                            <input type="number" id="filter-year-to" placeholder="To (2026)" min="1800" max="2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Language Filter -->
+                    <div class="space-y-2 mb-5 pt-2 border-t border-slate-200">
+                        <label class="text-xs font-bold text-slate-700 block">Language</label>
+                        <div id="language-filter-options" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                            <span class="text-[11px] text-slate-500">Languages will appear after a search.</span>
+                        </div>
+                    </div>
+
+                    <!-- Publication Type Checkboxes -->
+                    <div class="space-y-2 mb-5">
+                        <label class="text-xs font-bold text-slate-400 block">Document Type</label>
+                        <div class="space-y-2 pr-1">
+                            <label class="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer hover:text-white">
+                                <input type="checkbox" value="article" class="filter-doctype text-sky-500 rounded border-slate-700 bg-slate-950 focus:ring-sky-500" checked>
+                                <span>Journal Article</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer hover:text-white">
+                                <input type="checkbox" value="preprint" class="filter-doctype text-sky-500 rounded border-slate-700 bg-slate-950 focus:ring-sky-500" checked>
+                                <span>Preprint (arXiv / bioRxiv)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer hover:text-white">
+                                <input type="checkbox" value="book" class="filter-doctype text-sky-500 rounded border-slate-700 bg-slate-950 focus:ring-sky-500" checked>
+                                <span>Book / Monograph</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer hover:text-white">
+                                <input type="checkbox" value="thesis" class="filter-doctype text-sky-500 rounded border-slate-700 bg-slate-950 focus:ring-sky-500" checked>
+                                <span>Dissertation / Thesis</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Peer Review Checkbox -->
+                    <div class="space-y-2 mb-5 pt-2 border-t border-slate-800/60">
+                        <label class="flex items-center space-x-2.5 cursor-pointer">
+                            <input type="checkbox" id="filter-peer-reviewed" class="text-sky-500 rounded border-slate-700 bg-slate-950 focus:ring-sky-500">
+                            <span class="text-xs font-semibold text-slate-300">Peer-Reviewed Only</span>
+                        </label>
+                    </div>
+
+                    <!-- Apply Filters Button -->
+                    <button onclick="applyClientFilters()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-bold rounded-xl border border-slate-700/80 transition shadow">
+                        Update Results
+                    </button>
+<p> <span class="text-xs font-semibold text-slate-300">Conceptualized and developed by</span>
+<br>
+Dr. Joydip Chandra</span>
+
+
+                </div>
+            </aside>
+
+            <!-- Results List Display Area -->
+            <main class="lg:col-span-3 space-y-4">
+
+                <!-- Results Header Controls Bar -->
+                <div class="bg-slate-900 border border-slate-800/80 rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-md glass-panel">
+                    <div id="results-count-summary" class="text-xs text-slate-400 font-medium">
+                        Ready to search across <span class="text-sky-400 font-bold">10 global open-access repositories</span>.
+                    </div>
+
+                    <!-- Global Checkbox Control Options -->
+                    <div class="flex items-center space-x-4 text-xs">
+                        <div class="select-all-results-control flex items-center space-x-2 rounded-lg px-2.5 py-1">
+                            <input type="checkbox" id="select-all-results-cb" onchange="toggleSelectAllPageResults(this.checked)" class="text-sky-500 rounded border-slate-700 bg-slate-900 focus:ring-sky-500">
+                            <label for="select-all-results-cb" class="text-xs text-slate-300 font-medium cursor-pointer">Select All on Page</label>
+                        </div>
+
+                        <div class="flex items-center space-x-1.5">
+                            <label class="text-slate-400 text-xs">Sort:</label>
+                            <select id="sort-results-select" onchange="sortDisplayedResults()" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-slate-300 focus:outline-none focus:border-sky-500 text-xs">
+                                <option value="relevance">Relevance</option>
+                                <option value="date-desc">Newest First</option>
+                                <option value="date-asc">Oldest First</option>
+                                <option value="title">Title (A-Z)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State Screen -->
+                <div id="loading-state" class="hidden py-16 text-center space-y-3 bg-slate-900/50 rounded-2xl border border-slate-800/80 glass-panel">
+                    <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-sky-500 border-t-transparent"></div>
+                    <p class="text-sm text-slate-200 font-bold">Querying federated open access APIs simultaneously...</p>
+                    <p class="text-xs text-slate-400">Performing multi-page parallel fetch across OpenAlex, Europe PMC, arXiv, CORE, DOAJ, Unpaywall & Semantic Scholar</p>
+                </div>
+
+                <!-- Initial Empty State -->
+                <div id="empty-state" class="py-16 text-center bg-slate-900/40 rounded-2xl border border-dashed border-slate-800/80 space-y-3 glass-panel">
+                    <div class="bg-slate-800/80 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto text-sky-400 shadow-inner">
+                        <i class="fa-solid fa-book-open-reader text-2xl"></i>
+                    </div>
+                    <h3 class="text-slate-200 font-bold text-base">Begin Your Academic Research</h3>
+                    <p class="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">Enter search topics, title keywords, or specific DOIs in the query builder above to retrieve peer-reviewed articles with direct full-text access.</p>
+                </div>
+
+                <!-- Results Output Container -->
+                <div id="results-list" class="space-y-4"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scopus Key Modal -->
+    <div id="scopus-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 glass-panel">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-key text-amber-400"></i> Elsevier Scopus API Integration
+                </h3>
+                <button onclick="toggleScopusModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+                To query Scopus for open-access items directly, enter your developer key. Obtain a free key from the <a href="https://dev.elsevier.com" target="_blank" class="text-sky-400 underline">Elsevier Developer Portal</a>.
+            </p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Scopus API Key</label>
+                <input type="password" id="scopus-api-key-input" placeholder="e.g. 7f9a8b..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-amber-400 focus:outline-none font-mono">
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="saveScopusApiKey('')" class="px-3 py-1.5 text-xs text-slate-400 hover:text-white">Clear Key</button>
+                <button onclick="saveScopusApiKeyFromInput()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition">Save Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Citations Modal -->
+    <div id="citation-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-5 max-h-[85vh] flex flex-col glass-panel">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-quote-right text-sky-400 text-base"></i>
+                    <h3 class="text-base font-bold text-slate-100">Academic Citation & Reference Generator</h3>
+                </div>
+                <button onclick="toggleCitationModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Citation Standard Tabs -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3" id="citation-format-tabs">
+                <button onclick="setCitationFormat('apa')" class="cit-tab cit-active px-3 py-1.5 rounded-xl text-xs font-semibold" data-fmt="apa">APA 7th</button>
+                <button onclick="setCitationFormat('mla')" class="cit-tab cit-inactive px-3 py-1.5 rounded-xl text-xs font-semibold" data-fmt="mla">MLA 9th</button>
+                <button onclick="setCitationFormat('chicago')" class="cit-tab cit-inactive px-3 py-1.5 rounded-xl text-xs font-semibold" data-fmt="chicago">Chicago 17th</button>
+                <button onclick="setCitationFormat('ieee')" class="cit-tab cit-inactive px-3 py-1.5 rounded-xl text-xs font-semibold" data-fmt="ieee">IEEE</button>
+                <button onclick="setCitationFormat('harvard')" class="cit-tab cit-inactive px-3 py-1.5 rounded-xl text-xs font-semibold" data-fmt="harvard">Harvard</button>
+                <button onclick="setCitationFormat('bibtex')" class="cit-tab cit-inactive px-3 py-1.5 rounded-xl text-xs font-semibold" data-fmt="bibtex">BibTeX</button>
+            </div>
+
+            <!-- Citation Text Box -->
+            <div class="flex-1 overflow-y-auto bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 leading-relaxed whitespace-pre-wrap select-all shadow-inner" id="citation-text-box">
+                No items currently selected. Please check article checkboxes in search results to generate references.
+            </div>
+
+            <!-- Download and Clipboard Buttons -->
+            <div class="flex flex-wrap justify-between items-center gap-3 pt-2">
+                <span class="text-xs text-slate-400 font-medium" id="citation-selected-summary">0 article(s) selected</span>
+                <div class="flex space-x-2">
+                    <button onclick="copyCitationsToClipboard()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 font-semibold text-xs rounded-xl border border-slate-700 transition flex items-center gap-2">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Copy Citations</span>
+                    </button>
+                    <button onclick="downloadCitationsFile()" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span>Download Export File</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * OmniScholar Application State
+         */
+        const DATABASES = [
+            { id: 'openalex', name: 'OpenAlex', desc: '250M+ Works & Publisher DOIs', active: true, icon: 'fa-globe' },
+            { id: 'core', name: 'CORE Aggregator', desc: 'ROAR & OpenDOAR Repositories', active: true, icon: 'fa-cubes' },
+            { id: 'arxiv', name: 'arXiv', desc: 'Physics, CS, Math & Stats Preprints', active: true, icon: 'fa-atom' },
+            { id: 'doaj', name: 'DOAJ', desc: 'Directory of Open Access Journals', active: true, icon: 'fa-book' },
+            { id: 'doab', name: 'DOAB', desc: 'Directory of Open Access Books', active: true, icon: 'fa-book-journal-whills' },
+            { id: 'epmc', name: 'Europe PMC / PMC', desc: 'Biomedical Full Text Articles', active: true, icon: 'fa-dna' },
+            { id: 'unpaywall', name: 'Unpaywall', desc: 'Direct Publisher OA PDF Resolver', active: true, icon: 'fa-unlock' },
+            { id: 's2', name: 'Semantic Scholar', desc: 'AI Citation & Metadata Graph', active: true, icon: 'fa-brain' },
+            { id: 'scopus', name: 'Scopus OA', desc: 'Elsevier Open Access (Requires Key)', active: false, icon: 'fa-key' }
+        ];
+
+        let state = {
+            queryRows: [
+                { id: 1, boolean: 'AND', field: 'all', value: '' }
+            ],
+            scopusApiKey: localStorage.getItem('omni_scopus_api_key') || '',
+            searchResults: [],
+            displayedResults: [],
+            selectedArticles: new Map(),
+            activeCitationFormat: 'apa',
+            isLoading: false
+        };
+
+        // Render Database Selection Grid
+        function renderDatabaseSelectors() {
+            const container = document.getElementById('source-checkbox-container');
+            container.innerHTML = DATABASES.map(db => `
+                <label class="database-tile ${db.active ? 'database-active' : ''} flex items-start space-x-2.5 p-2 rounded-xl border cursor-pointer transition">
+                    <input type="checkbox" onchange="toggleDatabaseSource('${db.id}', this.checked)" ${db.active ? 'checked' : ''} class="mt-0.5 rounded border-slate-400 focus:ring-violet-500">
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-slate-900 flex items-center gap-1.5 truncate">
+                            <i class="database-icon fa-solid ${db.icon} text-[10px]"></i>
+                            <span>${db.name}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 truncate">${db.desc}</div>
+                    </div>
+                </label>
+            `).join('');
+            
+            updateScopusStatusText();
+        }
+
+        function toggleDatabaseSource(id, checked) {
+            const db = DATABASES.find(d => d.id === id);
+            if (db) db.active = checked;
+            if (id === 'scopus' && checked && !state.scopusApiKey) {
+                toggleScopusModal();
+            }
+            renderDatabaseSelectors();
+        }
+
+        function selectAllSources(status) {
+            DATABASES.forEach(d => {
+                if(d.id === 'scopus' && status && !state.scopusApiKey) return;
+                d.active = status;
+            });
+            renderDatabaseSelectors();
+        }
+
+        // Render Boolean Query Rows
+        function renderQueryRows() {
+            const container = document.getElementById('query-rows-container');
+            container.innerHTML = state.queryRows.map((row, index) => `
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                    ${index > 0 ? `
+                        <select onchange="updateRowBoolean(${row.id}, this.value)" class="w-24 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold text-sky-400 focus:outline-none focus:border-sky-500">
+                            <option value="AND" ${row.boolean === 'AND' ? 'selected' : ''}>AND</option>
+                            <option value="OR" ${row.boolean === 'OR' ? 'selected' : ''}>OR</option>
+                            <option value="NOT" ${row.boolean === 'NOT' ? 'selected' : ''}>NOT</option>
+                        </select>
+                    ` : '<div class="w-24 px-2 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Query</div>'}
+
+                    <select onchange="updateRowField(${row.id}, this.value)" class="w-36 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-sky-500">
+                        <option value="all" ${row.field === 'all' ? 'selected' : ''}>All Fields</option>
+                        <option value="title" ${row.field === 'title' ? 'selected' : ''}>Title</option>
+                        <option value="author" ${row.field === 'author' ? 'selected' : ''}>Author</option>
+                        <option value="abstract" ${row.field === 'abstract' ? 'selected' : ''}>Abstract</option>
+                        <option value="doi" ${row.field === 'doi' ? 'selected' : ''}>DOI / ISSN</option>
+                    </select>
+
+                    <div class="relative flex-1">
+                        <input type="text" id="query-input-${row.id}" value="${escapeHtml(row.value)}" oninput="updateRowValue(${row.id}, this.value)" onkeydown="if(event.key==='Enter') executeScholarlySearch()" placeholder="Enter search terms, keywords, or DOI (e.g. 10.1038/s41586-020-2649-2)..." class="query-text-input w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500">
+                    </div>
+
+                    ${state.queryRows.length > 1 ? `
+                        <button onclick="removeQueryRow(${row.id})" class="p-2 text-slate-500 hover:text-red-400 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function addQueryRow() {
+            state.queryRows.push({ id: Date.now(), boolean: 'AND', field: 'all', value: '' });
+            renderQueryRows();
+        }
+
+        function removeQueryRow(id) {
+            state.queryRows = state.queryRows.filter(r => r.id !== id);
+            renderQueryRows();
+        }
+
+        function updateRowBoolean(id, val) { const r = state.queryRows.find(x => x.id === id); if(r) r.boolean = val; }
+        function updateRowField(id, val) { const r = state.queryRows.find(x => x.id === id); if(r) r.field = val; }
+        function updateRowValue(id, val) { const r = state.queryRows.find(x => x.id === id); if(r) r.value = val; }
+
+        function resetSearchQuery() {
+            state.queryRows = [{ id: 1, boolean: 'AND', field: 'all', value: '' }];
+            renderQueryRows();
+        }
+
+        // External Search Redirection Handler
+        function openExternalSearch(engine) {
+            // Collect query strings from the query builder inputs
+            const queryInputs = document.querySelectorAll('.query-text-input');
+            const terms = Array.from(queryInputs).map(inp => inp.value.trim()).filter(Boolean);
+            const query = terms.join(' ');
+            const encodedQuery = encodeURIComponent(query);
+
+            const scholarQuery = query;
+            const shodhQuery = `site:shodhganga.inflibnet.ac.in ${query}`;
+            const engineUrls = {
+                scholar: `https://scholar.google.com/scholar?q=${encodeURIComponent(scholarQuery)}&as_filetype=pdf`,
+                base: `https://www.base-search.net/Search/Results?lookfor=${encodedQuery}`,
+                /* Shodhganga's internal search can be inconsistent; keep the same query but constrain a web search to the repository. */
+                shodhganga: `https://www.google.com/search?q=${encodeURIComponent(shodhQuery)}`,
+                worldcat: `https://www.worldcat.org/search?q=${encodedQuery}`
+            };
+
+            if (engineUrls[engine]) {
+                window.open(engineUrls[engine], '_blank');
+            }
+        }
+
+        function normalizeDOIValue(doi) {
+            if (!doi) return '';
+            return String(doi).trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').replace(/^doi:\s*/i, '').replace(/[.\s]+$/, '');
+        }
+
+        function normalizeLanguage(value) {
+            if (Array.isArray(value)) {
+                value = value.map(v => typeof v === 'string' ? v : (v?.name || v?.code)).filter(Boolean)[0];
+            }
+            if (value && typeof value === 'object') value = value.name || value.code;
+            if (!value) return 'Language not specified';
+            const map = { en: 'English', eng: 'English', english: 'English', hi: 'Hindi', hin: 'Hindi', bn: 'Bengali', ben: 'Bengali', fr: 'French', fra: 'French', de: 'German', deu: 'German', es: 'Spanish', spa: 'Spanish', pt: 'Portuguese', por: 'Portuguese', it: 'Italian', ita: 'Italian', zh: 'Chinese', zho: 'Chinese', ja: 'Japanese', jpn: 'Japanese', ru: 'Russian', rus: 'Russian' };
+            const key = String(value).trim().toLowerCase();
+            return map[key] || String(value).trim();
+        }
+
+        function normalizeTitle(value) {
+            return String(value || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        function normalizeAuthors(value) {
+            return String(value || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        /* Remove duplicate records across databases. A title+author match is treated as the same work even when DOI strings differ. */
+        function deduplicateResults(items) {
+            const map = new Map();
+            items.forEach(item => {
+                const titleKey = normalizeTitle(item.title);
+                const authorKey = normalizeAuthors(item.authors);
+                const doiKey = normalizeDOIValue(item.doi).toLowerCase();
+                const key = (titleKey && authorKey) ? `ta:${titleKey}|${authorKey}` : (doiKey ? `doi:${doiKey}` : `id:${item.id}`);
+                const existing = map.get(key);
+                if (!existing) {
+                    item.doi = normalizeDOIValue(item.doi) || null;
+                    item.language = normalizeLanguage(item.language);
+                    map.set(key, item);
+                    return;
+                }
+                /* Merge useful metadata instead of changing the underlying search results logic. */
+                if (!existing.doi && item.doi) existing.doi = normalizeDOIValue(item.doi);
+                if ((!existing.pdfUrl || existing.pdfUrl.includes('doi.org')) && item.pdfUrl && !item.pdfUrl.includes('doi.org')) existing.pdfUrl = item.pdfUrl;
+                if ((!existing.abstract || existing.abstract.startsWith('No abstract')) && item.abstract) existing.abstract = item.abstract;
+                if ((!existing.journal || existing.journal.includes('Repository')) && item.journal) existing.journal = item.journal;
+                if (existing.language === 'Language not specified' && item.language) existing.language = normalizeLanguage(item.language);
+                existing.source = existing.source === item.source ? existing.source : `${existing.source} / ${item.source}`;
+            });
+            return Array.from(map.values());
+        }
+
+        function renderLanguageFilters() {
+            const container = document.getElementById('language-filter-options');
+            if (!container) return;
+            const languages = [...new Set(state.searchResults.map(r => normalizeLanguage(r.language)))].sort((a,b) => a.localeCompare(b));
+            if (!languages.length) {
+                container.innerHTML = '<span class="text-[11px] text-slate-500">Languages will appear after a search.</span>';
+                return;
+            }
+            container.innerHTML = languages.map(lang => `
+                <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer hover:text-slate-950">
+                    <input type="checkbox" class="filter-language rounded border-slate-400" value="${escapeHtml(lang)}" checked onchange="applyClientFilters()">
+                    <span>${escapeHtml(lang)}</span>
+                </label>`).join('');
+        }
+
+        /**
+         * SILENT MULTI-PAGE PARALLEL FETCHERS
+         */
+
+        // 1. OpenAlex Multi-Page Fetcher (4 pages x 100 items = 400 total)
+        async function fetchOpenAlex(term) {
+            const pages = [1, 2, 3, 4];
+            try {
+                const promises = pages.map(page => 
+                    fetch(`https://api.openalex.org/works?search=${encodeURIComponent(term)}&filter=is_oa:true&per_page=100&page=${page}`)
+                        .then(r => r.ok ? r.json() : { results: [] })
+                        .catch(() => ({ results: [] }))
+                );
+                const responses = await Promise.all(promises);
+                const rawItems = responses.flatMap(res => res.results || []);
+
+                return rawItems.map(item => ({
+                    id: item.id || Math.random().toString(),
+                    title: item.title || 'Untitled Academic Article',
+                    authors: (item.authorships || []).map(a => a.author?.display_name).filter(Boolean).join(', ') || 'Unknown Authors',
+                    year: item.publication_year || 'N/A',
+                    journal: item.primary_location?.source?.display_name || 'Open Repository',
+                    doi: normalizeDOIValue(item.doi),
+                    language: normalizeLanguage(item.language),
+                    pdfUrl: item.open_access?.oa_url || item.primary_location?.pdf_url || item.doi,
+                    abstract: reconstructOpenAlexAbstract(item.abstract_inverted_index),
+                    keywords: (item.keywords || []).map(k => k.display_name || k.keyword || k).filter(Boolean),
+                    source: 'OpenAlex',
+                    type: item.type || 'article',
+                    peerReviewed: true
+                }));
+            } catch (e) { console.error('OpenAlex Error:', e); return []; }
+        }
+
+        function reconstructOpenAlexAbstract(invIndex) {
+            if (!invIndex) return 'No abstract text available directly from repository.';
+            const words = [];
+            Object.entries(invIndex).forEach(([word, positions]) => {
+                positions.forEach(pos => words[pos] = word);
+            });
+            return words.join(' ').slice(0, 300) + '...';
+        }
+
+        // 2. arXiv Multi-Page Fetcher (4 pages x 100 items = 400 total)
+        async function fetchArXiv(term) {
+            const offsets = [0, 100, 200, 300];
+            try {
+                const promises = offsets.map(start =>
+                    fetch(`https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(term)}&start=${start}&max_results=100`)
+                        .then(r => r.ok ? r.text() : '')
+                        .catch(() => '')
+                );
+                const texts = await Promise.all(promises);
+                
+                const allEntries = [];
+                const parser = new DOMParser();
+
+                texts.forEach(text => {
+                    if(!text) return;
+                    const xml = parser.parseFromString(text, 'text/xml');
+                    const entries = Array.from(xml.getElementsByTagName('entry'));
+                    allEntries.push(...entries);
+                });
+
+                return allEntries.map(entry => {
+                    const id = entry.getElementsByTagName('id')[0]?.textContent || Math.random().toString();
+                    const title = entry.getElementsByTagName('title')[0]?.textContent?.replace(/\n/g, ' ').trim() || 'Untitled Preprint';
+                    const summary = entry.getElementsByTagName('summary')[0]?.textContent?.replace(/\n/g, ' ').trim() || '';
+                    const published = entry.getElementsByTagName('published')[0]?.textContent || '';
+                    const year = published ? new Date(published).getFullYear() : 'N/A';
+                    const authors = Array.from(entry.getElementsByTagName('author')).map(a => a.getElementsByTagName('name')[0]?.textContent).join(', ');
+                    
+                    const links = Array.from(entry.getElementsByTagName('link'));
+                    const pdfLink = links.find(l => l.getAttribute('title') === 'pdf')?.getAttribute('href') || id;
+
+                    return {
+                        id: id,
+                        title: title,
+                        authors: authors || 'arXiv Contributors',
+                        year: year,
+                        journal: 'arXiv Open Preprint Server',
+                        doi: null,
+                        language: 'English',
+                        pdfUrl: pdfLink,
+                        abstract: summary.slice(0, 300) + '...',
+                        keywords: [],
+                        source: 'arXiv',
+                        type: 'preprint',
+                        peerReviewed: false
+                    };
+                });
+            } catch (e) { console.error('arXiv Error:', e); return []; }
+        }
+
+        // 3. Europe PMC Multi-Page Fetcher (4 pages x 100 items = 400 total)
+        async function fetchEuropePMC(term) {
+            const pages = [1, 2, 3, 4];
+            try {
+                const promises = pages.map(page =>
+                    fetch(`https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=${encodeURIComponent(term)}+OPEN_ACCESS:Y&format=json&pageSize=100&page=${page}`)
+                        .then(r => r.ok ? r.json() : { resultList: { result: [] } })
+                        .catch(() => ({ resultList: { result: [] } }))
+                );
+                const responses = await Promise.all(promises);
+                const rawItems = responses.flatMap(res => res.resultList?.result || []);
+
+                return rawItems.map(item => ({
+                    id: item.id || Math.random().toString(),
+                    title: item.title?.replace(/<[^>]+>/g, '') || 'Untitled Biomedical Work',
+                    authors: item.authorString || 'Unknown Authors',
+                    year: item.pubYear || 'N/A',
+                    journal: item.journalTitle || 'Europe PMC Repository',
+                    doi: normalizeDOIValue(item.doi),
+                    language: normalizeLanguage(item.language || item.languageOfPublication),
+                    pdfUrl: item.doi ? `https://doi.org/${item.doi}` : `https://europepmc.org/article/${item.source}/${item.id}`,
+                    abstract: item.abstractText?.replace(/<[^>]+>/g, '').slice(0, 300) + '...' || 'Biomedical open-access full article.',
+                    keywords: Array.isArray(item.keywordList) ? item.keywordList.map(k => k.keyword || k).filter(Boolean) : [],
+                    source: 'Europe PMC',
+                    type: 'article',
+                    peerReviewed: true
+                }));
+            } catch (e) { console.error('Europe PMC Error:', e); return []; }
+        }
+
+        // 4. DOAJ Multi-Page Fetcher (4 pages x 100 items = 400 total)
+        async function fetchDOAJ(term) {
+            const pages = [1, 2, 3, 4];
+            try {
+                const promises = pages.map(page =>
+                    fetch(`https://doaj.org/api/search/articles/${encodeURIComponent(term)}?page=${page}&pageSize=100`)
+                        .then(r => r.ok ? r.json() : { results: [] })
+                        .catch(() => ({ results: [] }))
+                );
+                const responses = await Promise.all(promises);
+                const rawItems = responses.flatMap(res => res.results || []);
+
+                return rawItems.map(item => {
+                    const bib = item.bibjson || {};
+                    return {
+                        id: item.id || Math.random().toString(),
+                        title: bib.title || 'Untitled DOAJ Paper',
+                        authors: (bib.author || []).map(a => a.name).join(', ') || 'DOAJ Contributor',
+                        year: bib.year || 'N/A',
+                        journal: bib.journal?.title || 'Directory of Open Access Journals',
+                        doi: normalizeDOIValue((bib.identifier || []).find(i => i.type === 'doi')?.id),
+                        language: normalizeLanguage(bib.language),
+                        pdfUrl: (bib.link || []).find(l => l.type === 'fulltext')?.url || null,
+                        abstract: bib.abstract || 'Peer-reviewed open access journal publication.',
+                        keywords: Array.isArray(bib.subject) ? bib.subject.map(x => typeof x === 'string' ? x : (x.term || x.name)).filter(Boolean) : [],
+                        source: 'DOAJ',
+                        type: 'article',
+                        peerReviewed: true
+                    };
+                });
+            } catch (e) { console.error('DOAJ Error:', e); return []; }
+        }
+
+        // 5. Semantic Scholar Multi-Page Fetcher (4 offsets x 100 items = 400 total)
+        async function fetchSemanticScholar(term) {
+            const offsets = [0, 100, 200, 300];
+            try {
+                const promises = offsets.map(offset =>
+                    fetch(`https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(term)}&offset=${offset}&limit=100&fields=paperId,title,authors,year,venue,externalIds,isOpenAccess,openAccessPdf,abstract`)
+                        .then(r => r.ok ? r.json() : { data: [] })
+                        .catch(() => ({ data: [] }))
+                );
+                const responses = await Promise.all(promises);
+                const rawItems = responses.flatMap(res => res.data || []);
+
+                return rawItems.filter(p => p.isOpenAccess).map(p => ({
+                    id: p.paperId || Math.random().toString(),
+                    title: p.title || 'Untitled Work',
+                    authors: (p.authors || []).map(a => a.name).join(', ') || 'Unknown Author',
+                    year: p.year || 'N/A',
+                    journal: p.venue || 'Semantic Scholar Graph',
+                    doi: normalizeDOIValue(p.externalIds?.DOI),
+                    language: 'Language not specified',
+                    pdfUrl: p.openAccessPdf?.url || (p.externalIds?.DOI ? `https://doi.org/${p.externalIds.DOI}` : null),
+                    abstract: p.abstract ? p.abstract.slice(0, 300) + '...' : 'Indexed open access publication metadata.',
+                    keywords: [],
+                    source: 'Semantic Scholar',
+                    type: 'article',
+                    peerReviewed: true
+                }));
+            } catch (e) { console.error('Semantic Scholar Error:', e); return []; }
+        }
+
+        // 6. Scopus OA Multi-Page Fetcher (4 offsets x 25 items = 100 total, require key)
+        async function fetchScopusOA(term) {
+            if(!state.scopusApiKey) return [];
+            const offsets = [0, 25, 50, 75];
+            try {
+                const promises = offsets.map(start =>
+                    fetch(`https://api.elsevier.com/content/search/scopus?query=TITLE-ABS-KEY(${encodeURIComponent(term)}) AND OA(ALL)&apiKey=${state.scopusApiKey}&count=25&start=${start}&httpAccept=application/json`)
+                        .then(r => r.ok ? r.json() : { 'search-results': { entry: [] } })
+                        .catch(() => ({ 'search-results': { entry: [] } }))
+                );
+                const responses = await Promise.all(promises);
+                const rawItems = responses.flatMap(res => res['search-results']?.entry || []);
+
+                return rawItems.map(item => ({
+                    id: item['dc:identifier'] || Math.random().toString(),
+                    title: item['dc:title'] || 'Scopus Open Access Work',
+                    authors: item['dc:creator'] || 'Scopus Author',
+                    year: item['prism:coverDate'] ? item['prism:coverDate'].substring(0, 4) : 'N/A',
+                    journal: item['prism:publicationName'] || 'Scopus Indexed Journal',
+                    doi: normalizeDOIValue(item['prism:doi']),
+                    language: normalizeLanguage(item.language),
+                    pdfUrl: item['prism:doi'] ? `https://doi.org/${item['prism:doi']}` : item['link']?.find(l => l['@ref'] === 'scopus')?.['@href'],
+                    abstract: 'Indexed in Elsevier Scopus Open Access database.',
+                    keywords: item['authkeywords'] ? String(item['authkeywords']).split(/;|,/).map(k => k.trim()).filter(Boolean) : [],
+                    source: 'Scopus OA',
+                    type: 'article',
+                    peerReviewed: true
+                }));
+            } catch(e) { console.error('Scopus Fetch Error:', e); return []; }
+        }
+
+        /**
+         * Search Execution & Result Orchestration
+         */
+        async function executeScholarlySearch() {
+            const primaryTerm = state.queryRows
+                .map(r => r.value.trim())
+                .filter(Boolean)
+                .join(' ');
+
+            if (!primaryTerm) {
+                alert('Please enter keywords or titles into the search field.');
+                return;
+            }
+
+            state.isLoading = true;
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('results-list').innerHTML = '';
+
+            const fetchPromises = [];
+
+            if (isDbActive('openalex')) fetchPromises.push(fetchOpenAlex(primaryTerm));
+            if (isDbActive('arxiv')) fetchPromises.push(fetchArXiv(primaryTerm));
+            if (isDbActive('epmc')) fetchPromises.push(fetchEuropePMC(primaryTerm));
+            if (isDbActive('doaj')) fetchPromises.push(fetchDOAJ(primaryTerm));
+            if (isDbActive('s2')) fetchPromises.push(fetchSemanticScholar(primaryTerm));
+            if (isDbActive('scopus')) fetchPromises.push(fetchScopusOA(primaryTerm));
+
+            try {
+                const resultsArrays = await Promise.all(fetchPromises);
+                state.searchResults = deduplicateResults(resultsArrays.flat());
+                state.selectedArticles.clear();
+                state.displayedResults = [];
+                renderLanguageFilters();
+                refreshCitationExportState(false);
+                
+                state.isLoading = false;
+                document.getElementById('loading-state').classList.add('hidden');
+
+                if (state.searchResults.length === 0) {
+                    document.getElementById('results-list').innerHTML = `
+                        <div class="py-12 text-center text-slate-400 bg-slate-900/50 rounded-2xl border border-slate-800">
+                            <i class="fa-solid fa-circle-exclamation text-3xl mb-2 text-amber-400"></i>
+                            <p class="font-bold text-sm">No full-text articles matched your query across target sources.</p>
+                            <p class="text-xs text-slate-500 mt-1">Try broadening search parameters or selecting additional database checkboxes.</p>
+                        </div>
+                    `;
+                } else {
+                    applyClientFilters();
+                }
+            } catch (error) {
+                state.isLoading = false;
+                document.getElementById('loading-state').classList.add('hidden');
+                console.error('Search orchestration failure:', error);
+            }
+        }
+
+        function isDbActive(id) {
+            return DATABASES.find(d => d.id === id)?.active || false;
+        }
+
+        // Keep selection/citation/export synchronized with the currently displayed result set.
+        function refreshCitationExportState(pruneHiddenSelections = true) {
+            if (pruneHiddenSelections) {
+                const visibleIds = new Set(state.displayedResults.map(item => item.id));
+                Array.from(state.selectedArticles.keys()).forEach(id => {
+                    if (!visibleIds.has(id)) state.selectedArticles.delete(id);
+                });
+            }
+            const badge = document.getElementById('selected-count-badge');
+            if (badge) badge.textContent = state.selectedArticles.size;
+            const selectAll = document.getElementById('select-all-results-cb');
+            if (selectAll) {
+                const total = state.displayedResults.length;
+                const selectedVisible = state.displayedResults.filter(item => state.selectedArticles.has(item.id)).length;
+                selectAll.checked = total > 0 && selectedVisible === total;
+                selectAll.indeterminate = selectedVisible > 0 && selectedVisible < total;
+            }
+            const modal = document.getElementById('citation-modal');
+            if (modal && !modal.classList.contains('hidden')) generateCitationsText();
+        }
+
+        // Apply Client-Side Faceted Filters
+        function applyClientFilters() {
+            const yearFrom = parseInt(document.getElementById('filter-year-from').value) || 0;
+            const yearTo = parseInt(document.getElementById('filter-year-to').value) || 9999;
+            const peerOnly = document.getElementById('filter-peer-reviewed').checked;
+            
+            const selectedTypes = Array.from(document.querySelectorAll('.filter-doctype:checked')).map(cb => cb.value);
+            const selectedLanguages = Array.from(document.querySelectorAll('.filter-language:checked')).map(cb => cb.value);
+
+            state.displayedResults = state.searchResults.filter(item => {
+                const yr = parseInt(item.year) || 2020;
+                if (yr < yearFrom || yr > yearTo) return false;
+                if (peerOnly && !item.peerReviewed) return false;
+                if (selectedTypes.length > 0 && !selectedTypes.includes(item.type)) return false;
+                if (selectedLanguages.length > 0 && !selectedLanguages.includes(normalizeLanguage(item.language))) return false;
+                return true;
+            });
+
+            sortDisplayedResults();
+        }
+
+        function sortDisplayedResults() {
+            const sortVal = document.getElementById('sort-results-select').value;
+            
+            if (sortVal === 'date-desc') {
+                state.displayedResults.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+            } else if (sortVal === 'date-asc') {
+                state.displayedResults.sort((a, b) => (parseInt(a.year) || 0) - (parseInt(b.year) || 0));
+            } else if (sortVal === 'title') {
+                state.displayedResults.sort((a, b) => a.title.localeCompare(b.title));
+            }
+
+            renderResultsList(state.displayedResults);
+            refreshCitationExportState(true);
+        }
+
+        function clearAllFilters() {
+            document.getElementById('filter-year-from').value = '';
+            document.getElementById('filter-year-to').value = '';
+            document.getElementById('filter-peer-reviewed').checked = false;
+            document.querySelectorAll('.filter-doctype').forEach(cb => cb.checked = true);
+            document.querySelectorAll('.filter-language').forEach(cb => cb.checked = true);
+            applyClientFilters();
+        }
+
+        // Render Search Results Cards with Checkboxes
+        function renderResultsList(items) {
+            const container = document.getElementById('results-list');
+            document.getElementById('results-count-summary').innerHTML = `
+                Displaying <span class="text-sky-400 font-bold">${items.length}</span> full-text open publications.
+            `;
+
+            container.innerHTML = items.map(item => {
+                const isSelected = state.selectedArticles.has(item.id);
+                return `
+                    <article class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 hover:border-slate-700 transition shadow-lg group relative glass-panel result-card-virtual">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex items-start space-x-3.5">
+                                <!-- Individual Selection Checkbox -->
+                                <input type="checkbox" onchange="toggleArticleSelection('${item.id}', this.checked)" ${isSelected ? 'checked' : ''} class="mt-1 text-sky-500 rounded border-slate-700 bg-slate-950 focus:ring-sky-500">
+                                <div>
+                                    <!-- Title -->
+                                    <h3 class="text-sm font-bold text-slate-100 group-hover:text-sky-400 transition leading-snug">
+                                        <a href="${item.pdfUrl || '#'}" target="_blank" class="hover:underline">${escapeHtml(item.title)}</a>
+                                    </h3>
+                                    
+                                    <!-- Metadata Row -->
+                                    <div class="text-xs text-slate-400 mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-medium">
+                                        <span class="text-slate-200">${escapeHtml(item.authors)}</span>
+                                        <span class="text-slate-600">•</span>
+                                        <span class="text-slate-400">${item.year}</span>
+                                        <span class="text-slate-600">•</span>
+                                        <span class="text-sky-400/90 italic">${escapeHtml(item.journal)}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Repository Badge -->
+                            <span class="px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-300 text-[10px] font-bold border border-slate-700 whitespace-nowrap">
+                                ${item.source}
+                            </span>
+                        </div>
+
+                        <!-- Abstract -->
+                        <p class="text-xs text-slate-400 mt-3 leading-relaxed line-clamp-2">
+                            ${escapeHtml(item.abstract)}
+                        </p>
+
+                        <!-- Card Actions Toolbar -->
+                        <div class="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center space-x-2">
+                                ${item.pdfUrl ? `
+                                    <a href="${item.pdfUrl}" target="_blank" class="px-3 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold flex items-center gap-1.5 transition">
+                                        <i class="fa-solid fa-file-pdf text-xs"></i>
+                                        <span>Full Text PDF</span>
+                                    </a>
+                                ` : ''}
+
+                                ${item.doi ? `
+                                    <a href="https://doi.org/${item.doi}" target="_blank" class="px-2.5 py-1 bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800 rounded-lg text-[11px] font-mono transition">
+                                        DOI: ${item.doi}
+                                    </a>
+                                ` : ''}
+                            </div>
+
+                            <div class="flex items-center space-x-2 text-xs">
+                                ${item.peerReviewed ? `
+                                    <span class="text-emerald-400 text-[10px] font-semibold flex items-center gap-1 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/20">
+                                        <i class="fa-solid fa-check text-[9px]"></i> Peer-Reviewed
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // Toggle Select All Page Checkbox
+        function toggleSelectAllPageResults(checked) {
+            state.displayedResults.forEach(item => {
+                if(checked) {
+                    state.selectedArticles.set(item.id, item);
+                } else {
+                    state.selectedArticles.delete(item.id);
+                }
+            });
+            renderResultsList(state.displayedResults);
+            refreshCitationExportState(false);
+        }
+
+        /**
+         * Citation Generator & Export Functions
+         */
+        function toggleArticleSelection(id, isSelected) {
+            const article = state.searchResults.find(a => a.id === id);
+            if (!article) return;
+
+            if (isSelected) {
+                state.selectedArticles.set(id, article);
+            } else {
+                state.selectedArticles.delete(id);
+            }
+
+            refreshCitationExportState(false);
+        }
+
+        function toggleCitationModal() {
+            const modal = document.getElementById('citation-modal');
+            modal.classList.toggle('hidden');
+            if(!modal.classList.contains('hidden')) {
+                generateCitationsText();
+            }
+        }
+
+        function setCitationFormat(fmt) {
+            state.activeCitationFormat = fmt;
+            document.querySelectorAll('.cit-tab').forEach(tab => {
+                if(tab.dataset.fmt === fmt) {
+                    tab.className = 'cit-tab cit-active px-3 py-1.5 rounded-xl text-xs font-semibold';
+                } else {
+                    tab.className = 'cit-tab cit-inactive px-3 py-1.5 rounded-xl text-xs font-semibold hover:text-slate-900';
+                }
+            });
+            generateCitationsText();
+        }
+
+        function generateCitationsText() {
+            const box = document.getElementById('citation-text-box');
+            let items = Array.from(state.selectedArticles.values());
+            if (state.activeCitationFormat === 'apa') {
+                items = items.sort((a, b) => {
+                    const ak = String(a.authors || 'Unknown Author').toLowerCase();
+                    const bk = String(b.authors || 'Unknown Author').toLowerCase();
+                    const authorCmp = ak.localeCompare(bk);
+                    if (authorCmp !== 0) return authorCmp;
+                    const yc = (parseInt(a.year) || 9999) - (parseInt(b.year) || 9999);
+                    if (yc !== 0) return yc;
+                    return String(a.title || '').localeCompare(String(b.title || ''));
+                });
+            }
+
+            document.getElementById('citation-selected-summary').textContent = `${items.length} article(s) selected`;
+
+            if (items.length === 0) {
+                box.textContent = 'No articles selected. Select article checkboxes in search results to generate citations.';
+                return;
+            }
+
+            const formatted = items.map(item => formatSingleCitation(item, state.activeCitationFormat)).join('\n\n');
+            box.textContent = formatted;
+        }
+
+        function bibtexEscape(value) {
+            return String(value || '').replace(/([{}])/g, '\$1').replace(/\s+/g, ' ').trim();
+        }
+
+        function formatSingleCitation(item, fmt) {
+            const authors = item.authors || 'Unknown Author';
+            const title = item.title || 'Untitled Work';
+            const year = item.year || 'n.d.';
+            const journal = item.journal || 'Open Access Repository';
+            const doi = item.doi ? `https://doi.org/${item.doi}` : item.pdfUrl || '';
+
+            switch(fmt) {
+                case 'apa':
+                    return `${authors} (${year}). ${title}. ${journal}. ${doi}`;
+                case 'mla':
+                    return `${authors}. "${title}." ${journal}, ${year}, ${doi}.`;
+                case 'chicago':
+                    return `${authors}. "${title}." ${journal} (${year}). ${doi}.`;
+                case 'ieee':
+                    return `[1] ${authors}, "${title}," ${journal}, ${year}. [Online]. Available: ${doi}`;
+                case 'harvard':
+                    return `${authors}, ${year}. ${title}. ${journal}. Available at: ${doi}`;
+                case 'bibtex':
+                    const citeKey = (authors.split(' ')[0] || 'Author') + year + (title.split(' ')[0] || 'Paper');
+                    const keywords = Array.isArray(item.keywords) ? item.keywords.join('; ') : (item.keywords || '');
+                    return `@article{${citeKey.replace(/[^a-zA-Z0-9]/g, '')},\n  author = {${bibtexEscape(authors)}},\n  title = {${bibtexEscape(title)}},\n  journal = {${bibtexEscape(journal)}},\n  year = {${bibtexEscape(year)}},\n  doi = {${bibtexEscape(item.doi || '')}},\n  keywords = {${bibtexEscape(keywords)}},\n  url = {${bibtexEscape(doi)}}\n}`;
+                default:
+                    return `${authors} (${year}). ${title}. ${journal}.`;
+            }
+        }
+
+        function copyCitationsToClipboard() {
+            const text = document.getElementById('citation-text-box').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Citations successfully copied to clipboard!');
+            });
+        }
+
+        function downloadCitationsFile() {
+            const text = document.getElementById('citation-text-box').textContent;
+            const ext = state.activeCitationFormat === 'bibtex' ? 'bib' : 'txt';
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `omnischolar_citations.${ext}`;
+            a.click();
+        }
+
+        // Scopus API Modal Handlers
+        function toggleScopusModal() {
+            document.getElementById('scopus-modal').classList.toggle('hidden');
+        }
+
+        function saveScopusApiKeyFromInput() {
+            const val = document.getElementById('scopus-api-key-input').value.trim();
+            saveScopusApiKey(val);
+        }
+
+        function saveScopusApiKey(key) {
+            state.scopusApiKey = key;
+            localStorage.setItem('omni_scopus_api_key', key);
+            
+            const scopusDb = DATABASES.find(d => d.id === 'scopus');
+            if (scopusDb) scopusDb.active = !!key;
+            
+            updateScopusStatusText();
+            renderDatabaseSelectors();
+            toggleScopusModal();
+        }
+
+        function updateScopusStatusText() {
+            const btn = document.getElementById('scopus-status-text');
+            if (state.scopusApiKey) {
+                btn.textContent = 'Scopus Active';
+                btn.className = 'text-amber-400 font-bold';
+            } else {
+                btn.textContent = 'Scopus Key';
+                btn.className = 'text-slate-400';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        // Application Initialization
+        window.onload = function() {
+            renderDatabaseSelectors();
+            renderQueryRows();
+        };
+    </script>
+<div class="mt-8 text-center text-xs text-slate-500 border-t border-slate-900 pt-4">
+    <i>Conceptualized by:</i> <b class="text-slate-400">Dr. Joydip Chandra, BRSC</b>
+</div>
+</body>
+</html>
