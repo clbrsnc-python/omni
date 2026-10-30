@@ -110,9 +110,60 @@
         .cit-tab.cit-active { background: #ede9fe !important; color: #5b21b6 !important; border-color: #a78bfa !important; }
         .cit-tab.cit-inactive { background: #f0fdfa !important; color: #475569 !important; }
 
+        body.auth-locked { overflow: auto; }
     </style>
 </head>
-<body class="h-full flex flex-col font-sans bg-sky-50 text-slate-900 antialiased selection:bg-sky-200 selection:text-slate-900">
+<body class="h-full flex flex-col font-sans bg-sky-50 text-slate-900 antialiased selection:bg-sky-200 selection:text-slate-900 auth-locked">
+
+    <!-- Authentication gate: shown before the unchanged OmniScholar workspace. -->
+    <section id="auth-screen" class="min-h-screen w-full flex items-center justify-center p-4 bg-sky-50">
+        <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl p-7 space-y-5">
+            <div class="text-center space-y-1">
+                <div class="inline-flex items-center justify-center bg-gradient-to-tr from-sky-500 to-indigo-600 p-3 rounded-xl text-white shadow-lg"><i class="fa-solid fa-graduation-cap text-2xl"></i></div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">OmniScholar</h1>
+                <p class="text-xs text-slate-500">Universal Scholarly Search & Citation Engine</p>
+            </div>
+            <div id="auth-notice" class="hidden rounded-xl p-3 text-xs" role="status" aria-live="polite"></div>
+            <div id="auth-config-warning" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">Supabase is not configured yet. Add your project URL and publishable/anon key in the configuration section of this file before deployment.</div>
+            <div id="auth-login-panel" class="space-y-3">
+                <h2 class="text-lg font-bold text-slate-800">Sign in</h2>
+                <form id="auth-login-form" class="space-y-3">
+                    <input id="login-email" type="email" autocomplete="email" required placeholder="Email address" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
+                    <input id="login-password" type="password" autocomplete="current-password" required placeholder="Password" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
+                    <button id="login-submit" class="w-full rounded-xl py-3 text-sm font-bold text-white bg-gradient-to-r from-sky-600 to-indigo-600">Sign in</button>
+                </form>
+                <div class="flex justify-between text-xs"><button id="show-forgot" class="text-sky-700 hover:underline" type="button">Forgot password?</button><button id="show-signup" class="text-sky-700 hover:underline" type="button">Create an account</button></div>
+            </div>
+            <div id="auth-signup-panel" class="hidden space-y-3">
+                <h2 class="text-lg font-bold text-slate-800">Create your account</h2>
+                <form id="auth-signup-form" class="space-y-3">
+                    <input id="signup-name" type="text" autocomplete="name" required maxlength="100" placeholder="Full name" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
+                    <input id="signup-email" type="email" autocomplete="email" required placeholder="Email address" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
+                    <input id="signup-password" type="password" autocomplete="new-password" minlength="8" required placeholder="Password (at least 8 characters)" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
+                    <button class="w-full rounded-xl py-3 text-sm font-bold text-white bg-gradient-to-r from-sky-600 to-indigo-600">Register</button>
+                </form>
+                <button id="back-login-from-signup" class="text-xs text-sky-700 hover:underline" type="button">Back to sign in</button>
+                <p class="text-[11px] text-slate-500">You must verify your email address before accessing the research workspace.</p>
+            </div>
+            <div id="auth-forgot-panel" class="hidden space-y-3">
+                <h2 class="text-lg font-bold text-slate-800">Reset your password</h2>
+                <form id="auth-forgot-form" class="space-y-3">
+                    <input id="forgot-email" type="email" autocomplete="email" required placeholder="Registered email address" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
+                    <button class="w-full rounded-xl py-3 text-sm font-bold text-white bg-gradient-to-r from-sky-600 to-indigo-600">Send reset link</button>
+                </form>
+                <button id="back-login-from-forgot" class="text-xs text-sky-700 hover:underline" type="button">Back to sign in</button>
+            </div>
+            <div id="auth-reset-panel" class="hidden space-y-3">
+                <h2 class="text-lg font-bold text-slate-800">Choose a new password</h2>
+                <form id="auth-reset-form" class="space-y-3">
+                    <input id="reset-password" type="password" autocomplete="new-password" minlength="8" required placeholder="New password (at least 8 characters)" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
+                    <button class="w-full rounded-xl py-3 text-sm font-bold text-white bg-gradient-to-r from-sky-600 to-indigo-600">Update password</button>
+                </form>
+            </div>
+            <p class="text-[10px] text-center text-slate-400">Secure account access powered by Supabase</p>
+        </div>
+    </section>
+    <div id="app-shell" class="hidden">
 
     <header class="border-b border-slate-800/80 bg-slate-900/90 sticky top-0 z-40 backdrop-blur-md shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -133,6 +184,7 @@
 
             <!-- Header Action Controls -->
             <div class="flex items-center space-x-3">
+                <button id="auth-state-signout" type="button" class="text-xs text-slate-500 hover:text-red-600" title="Sign out"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
                 <button onclick="toggleScopusModal()" class="header-scopus-btn flex items-center space-x-2 px-3 py-1.5 text-xs font-medium rounded-xl transition">
                     <i class="fa-solid fa-key text-amber-400"></i>
                     <span id="scopus-status-text">Scopus API Key</span>
@@ -428,6 +480,119 @@ Dr. Joydip Chandra</span>
     </div>
 
     <script>
+        // CONFIGURATION: replace these two values with your Supabase project values.
+        // Use the project's publishable (or legacy anon) key only. NEVER put service_role here.
+        const OMNI_SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+        const OMNI_SUPABASE_ANON_KEY = 'YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY';
+        window.omniSupabase = null;
+        window.omniUser = null;
+
+        function showAuthPanel(name) {
+            ['login','signup','forgot','reset'].forEach(p => document.getElementById(`auth-${p}-panel`).classList.toggle('hidden', p !== name));
+            const notice = document.getElementById('auth-notice');
+            notice.classList.add('hidden'); notice.textContent = '';
+        }
+        function authMessage(message, isError=false) {
+            const el = document.getElementById('auth-notice');
+            el.textContent = message;
+            el.className = `rounded-xl p-3 text-xs ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`;
+            el.classList.remove('hidden');
+        }
+        async function logOmniActivity(activity, metadata={}) {
+            if (!window.omniSupabase || !window.omniUser) return;
+            try {
+                const { error } = await window.omniSupabase.from('activity_logs').insert({ user_id: window.omniUser.id, activity, metadata });
+                if (error) console.warn('Activity logging failed:', error.message);
+            } catch (e) { console.warn('Activity logging failed:', e); }
+        }
+        async function loadScopusKeyStatus() {
+            state.scopusKeyConfigured = false;
+            if (!window.omniSupabase || !window.omniUser) return;
+            try {
+                const { data, error } = await window.omniSupabase.functions.invoke('scopus-search', { body: { action: 'status' } });
+                if (!error) state.scopusKeyConfigured = !!data?.configured;
+            } catch (e) { console.warn('Scopus key status unavailable:', e); }
+            const scopusDb = DATABASES.find(d => d.id === 'scopus');
+            if (scopusDb) scopusDb.active = state.scopusKeyConfigured;
+            updateScopusStatusText(); renderDatabaseSelectors();
+        }
+        async function enterOmniWorkspace(user) {
+            window.omniUser = user;
+            document.body.classList.remove('auth-locked');
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-shell').classList.remove('hidden');
+            await loadScopusKeyStatus();
+        }
+        async function leaveOmniWorkspace() {
+            window.omniUser = null;
+            state.scopusKeyConfigured = false;
+            document.getElementById('app-shell').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.body.classList.add('auth-locked');
+            showAuthPanel('login');
+        }
+        async function initializeOmniAuth() {
+            const configured = window.supabase && OMNI_SUPABASE_URL.startsWith('https://') && !OMNI_SUPABASE_URL.includes('YOUR_') && OMNI_SUPABASE_ANON_KEY && !OMNI_SUPABASE_ANON_KEY.includes('YOUR_');
+            if (!configured) {
+                document.getElementById('auth-config-warning').classList.remove('hidden');
+                return;
+            }
+            window.omniSupabase = window.supabase.createClient(OMNI_SUPABASE_URL, OMNI_SUPABASE_ANON_KEY, {
+                auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+            });
+            document.getElementById('auth-login-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const { data, error } = await window.omniSupabase.auth.signInWithPassword({ email: document.getElementById('login-email').value.trim(), password: document.getElementById('login-password').value });
+                if (error) return authMessage(error.message, true);
+                if (!data.user?.email_confirmed_at) { await window.omniSupabase.auth.signOut(); return authMessage('Please verify your email address using the confirmation link before signing in.', true); }
+                // The SIGNED_IN auth event opens the workspace and records the login.
+            });
+            document.getElementById('auth-signup-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const { data, error } = await window.omniSupabase.auth.signUp({
+                    email: document.getElementById('signup-email').value.trim(),
+                    password: document.getElementById('signup-password').value,
+                    options: { data: { full_name: document.getElementById('signup-name').value.trim() }, emailRedirectTo: location.origin + location.pathname }
+                });
+                if (error) return authMessage(error.message, true);
+                showAuthPanel('login');
+                authMessage('Registration received. Check your email and click the verification link. You can sign in after verification.');
+            });
+            document.getElementById('auth-forgot-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const { error } = await window.omniSupabase.auth.resetPasswordForEmail(document.getElementById('forgot-email').value.trim(), { redirectTo: location.origin + location.pathname });
+                if (error) return authMessage(error.message, true);
+                authMessage('If this email is registered, a password reset link has been sent.');
+            });
+            document.getElementById('auth-reset-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const { error } = await window.omniSupabase.auth.updateUser({ password: document.getElementById('reset-password').value });
+                if (error) return authMessage(error.message, true);
+                await window.omniSupabase.auth.signOut();
+                showAuthPanel('login');
+                authMessage('Password updated. You can now sign in with your new password.');
+            });
+            document.getElementById('show-signup').onclick = () => showAuthPanel('signup');
+            document.getElementById('show-forgot').onclick = () => showAuthPanel('forgot');
+            document.getElementById('back-login-from-signup').onclick = () => showAuthPanel('login');
+            document.getElementById('back-login-from-forgot').onclick = () => showAuthPanel('login');
+            document.getElementById('auth-state-signout')?.addEventListener('click', async () => { await logOmniActivity('logout'); await window.omniSupabase.auth.signOut(); });
+            window.omniSupabase.auth.onAuthStateChange((event, session) => {
+                if (event === 'PASSWORD_RECOVERY') { showAuthPanel('reset'); return; }
+                if (event === 'SIGNED_IN' && session?.user?.email_confirmed_at) {
+                    window.omniUser = session.user;
+                    Promise.resolve().then(() => logOmniActivity('login')).then(() => enterOmniWorkspace(session.user));
+                } else if (event === 'SIGNED_OUT') {
+                    Promise.resolve().then(() => leaveOmniWorkspace());
+                }
+            });
+            const { data: { session } } = await window.omniSupabase.auth.getSession();
+            if (session?.user?.email_confirmed_at) await enterOmniWorkspace(session.user);
+            else if (session) { await window.omniSupabase.auth.signOut(); authMessage('Please verify your email before accessing OmniScholar.', true); }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
         /**
          * OmniScholar Application State
          */
@@ -447,7 +612,7 @@ Dr. Joydip Chandra</span>
             queryRows: [
                 { id: 1, boolean: 'AND', field: 'all', value: '' }
             ],
-            scopusApiKey: localStorage.getItem('omni_scopus_api_key') || '',
+            scopusKeyConfigured: false,
             searchResults: [],
             displayedResults: [],
             selectedArticles: new Map(),
@@ -477,7 +642,8 @@ Dr. Joydip Chandra</span>
         function toggleDatabaseSource(id, checked) {
             const db = DATABASES.find(d => d.id === id);
             if (db) db.active = checked;
-            if (id === 'scopus' && checked && !state.scopusApiKey) {
+            if (id === 'scopus' && checked && !state.scopusKeyConfigured) {
+                if (db) db.active = false;
                 toggleScopusModal();
             }
             renderDatabaseSelectors();
@@ -485,7 +651,7 @@ Dr. Joydip Chandra</span>
 
         function selectAllSources(status) {
             DATABASES.forEach(d => {
-                if(d.id === 'scopus' && status && !state.scopusApiKey) return;
+                if(d.id === 'scopus' && status && !state.scopusKeyConfigured) return;
                 d.active = status;
             });
             renderDatabaseSelectors();
@@ -561,6 +727,7 @@ Dr. Joydip Chandra</span>
             };
 
             if (engineUrls[engine]) {
+                logOmniActivity('external_search', { resource: engine });
                 window.open(engineUrls[engine], '_blank');
             }
         }
@@ -819,33 +986,18 @@ Dr. Joydip Chandra</span>
 
         // 6. Scopus OA Multi-Page Fetcher (4 offsets x 25 items = 100 total, require key)
         async function fetchScopusOA(term) {
-            if(!state.scopusApiKey) return [];
-            const offsets = [0, 25, 50, 75];
+            if (!state.scopusKeyConfigured || !window.omniSupabase) return [];
             try {
-                const promises = offsets.map(start =>
-                    fetch(`https://api.elsevier.com/content/search/scopus?query=TITLE-ABS-KEY(${encodeURIComponent(term)}) AND OA(ALL)&apiKey=${state.scopusApiKey}&count=25&start=${start}&httpAccept=application/json`)
-                        .then(r => r.ok ? r.json() : { 'search-results': { entry: [] } })
-                        .catch(() => ({ 'search-results': { entry: [] } }))
-                );
-                const responses = await Promise.all(promises);
-                const rawItems = responses.flatMap(res => res['search-results']?.entry || []);
-
-                return rawItems.map(item => ({
-                    id: item['dc:identifier'] || Math.random().toString(),
-                    title: item['dc:title'] || 'Scopus Open Access Work',
-                    authors: item['dc:creator'] || 'Scopus Author',
-                    year: item['prism:coverDate'] ? item['prism:coverDate'].substring(0, 4) : 'N/A',
-                    journal: item['prism:publicationName'] || 'Scopus Indexed Journal',
-                    doi: normalizeDOIValue(item['prism:doi']),
-                    language: normalizeLanguage(item.language),
-                    pdfUrl: item['prism:doi'] ? `https://doi.org/${item['prism:doi']}` : item['link']?.find(l => l['@ref'] === 'scopus')?.['@href'],
-                    abstract: 'Indexed in Elsevier Scopus Open Access database.',
-                    keywords: item['authkeywords'] ? String(item['authkeywords']).split(/;|,/).map(k => k.trim()).filter(Boolean) : [],
-                    source: 'Scopus OA',
-                    type: 'article',
-                    peerReviewed: true
-                }));
-            } catch(e) { console.error('Scopus Fetch Error:', e); return []; }
+                const { data, error } = await window.omniSupabase.functions.invoke('scopus-search', {
+                    body: { action: 'search', term }
+                });
+                if (error) throw error;
+                return Array.isArray(data?.items) ? data.items : [];
+            } catch (e) {
+                console.error('Scopus Edge Function Error:', e);
+                alert('Scopus search could not be completed. Check your personal API key or try again later.');
+                return [];
+            }
         }
 
         /**
@@ -868,17 +1020,19 @@ Dr. Joydip Chandra</span>
             document.getElementById('results-list').innerHTML = '';
 
             const fetchPromises = [];
+            const queriedResources = [];
 
-            if (isDbActive('openalex')) fetchPromises.push(fetchOpenAlex(primaryTerm));
-            if (isDbActive('arxiv')) fetchPromises.push(fetchArXiv(primaryTerm));
-            if (isDbActive('epmc')) fetchPromises.push(fetchEuropePMC(primaryTerm));
-            if (isDbActive('doaj')) fetchPromises.push(fetchDOAJ(primaryTerm));
-            if (isDbActive('s2')) fetchPromises.push(fetchSemanticScholar(primaryTerm));
-            if (isDbActive('scopus')) fetchPromises.push(fetchScopusOA(primaryTerm));
+            if (isDbActive('openalex')) { fetchPromises.push(fetchOpenAlex(primaryTerm)); queriedResources.push('openalex'); }
+            if (isDbActive('arxiv')) { fetchPromises.push(fetchArXiv(primaryTerm)); queriedResources.push('arxiv'); }
+            if (isDbActive('epmc')) { fetchPromises.push(fetchEuropePMC(primaryTerm)); queriedResources.push('epmc'); }
+            if (isDbActive('doaj')) { fetchPromises.push(fetchDOAJ(primaryTerm)); queriedResources.push('doaj'); }
+            if (isDbActive('s2')) { fetchPromises.push(fetchSemanticScholar(primaryTerm)); queriedResources.push('s2'); }
+            if (isDbActive('scopus')) { fetchPromises.push(fetchScopusOA(primaryTerm)); queriedResources.push('scopus'); }
 
             try {
                 const resultsArrays = await Promise.all(fetchPromises);
                 state.searchResults = deduplicateResults(resultsArrays.flat());
+                await logOmniActivity('search', { resources: queriedResources, result_count: state.searchResults.length });
                 state.selectedArticles.clear();
                 state.displayedResults = [];
                 renderLanguageFilters();
@@ -1156,6 +1310,7 @@ Dr. Joydip Chandra</span>
 
         function copyCitationsToClipboard() {
             const text = document.getElementById('citation-text-box').textContent;
+            logOmniActivity('citation_copy', { format: state.activeCitationFormat, selected_count: state.selectedArticles.size });
             navigator.clipboard.writeText(text).then(() => {
                 alert('Citations successfully copied to clipboard!');
             });
@@ -1163,6 +1318,7 @@ Dr. Joydip Chandra</span>
 
         function downloadCitationsFile() {
             const text = document.getElementById('citation-text-box').textContent;
+            logOmniActivity('citation_export', { format: state.activeCitationFormat, selected_count: state.selectedArticles.size });
             const ext = state.activeCitationFormat === 'bibtex' ? 'bib' : 'txt';
             const blob = new Blob([text], { type: 'text/plain' });
             const a = document.createElement('a');
@@ -1171,31 +1327,43 @@ Dr. Joydip Chandra</span>
             a.click();
         }
 
-        // Scopus API Modal Handlers
+        // Scopus API Modal Handlers (key is stored encrypted server-side; never in browser storage)
         function toggleScopusModal() {
             document.getElementById('scopus-modal').classList.toggle('hidden');
+            document.getElementById('scopus-api-key-input').value = '';
         }
 
-        function saveScopusApiKeyFromInput() {
+        async function saveScopusApiKeyFromInput() {
             const val = document.getElementById('scopus-api-key-input').value.trim();
-            saveScopusApiKey(val);
+            if (!val) { alert('Please enter your Scopus API key.'); return; }
+            await saveScopusApiKey(val);
         }
 
-        function saveScopusApiKey(key) {
-            state.scopusApiKey = key;
-            localStorage.setItem('omni_scopus_api_key', key);
-            
-            const scopusDb = DATABASES.find(d => d.id === 'scopus');
-            if (scopusDb) scopusDb.active = !!key;
-            
-            updateScopusStatusText();
-            renderDatabaseSelectors();
-            toggleScopusModal();
+        async function saveScopusApiKey(key) {
+            if (!window.omniSupabase || !window.omniUser) { alert('Please sign in first.'); return; }
+            try {
+                const { data, error } = await window.omniSupabase.functions.invoke('scopus-search', {
+                    body: key ? { action: 'save', apiKey: key } : { action: 'delete' }
+                });
+                if (error) throw error;
+                state.scopusKeyConfigured = !!key;
+                const scopusDb = DATABASES.find(d => d.id === 'scopus');
+                if (scopusDb) scopusDb.active = !!key;
+                document.getElementById('scopus-api-key-input').value = '';
+                updateScopusStatusText();
+                renderDatabaseSelectors();
+                document.getElementById('scopus-modal').classList.add('hidden');
+                await logOmniActivity(key ? 'scopus_key_saved' : 'scopus_key_removed', { resource: 'Scopus' });
+            } catch (e) {
+                console.error('Scopus key save failed:', e);
+                alert('Could not save your Scopus key securely. Please check your Supabase Edge Function setup.');
+            }
         }
 
         function updateScopusStatusText() {
             const btn = document.getElementById('scopus-status-text');
-            if (state.scopusApiKey) {
+            if (!btn) return;
+            if (state.scopusKeyConfigured) {
                 btn.textContent = 'Scopus Active';
                 btn.className = 'text-amber-400 font-bold';
             } else {
@@ -1214,13 +1382,16 @@ Dr. Joydip Chandra</span>
         }
 
         // Application Initialization
-        window.onload = function() {
+        window.onload = async function() {
+            try { localStorage.removeItem('omni_scopus_api_key'); } catch (_) {}
             renderDatabaseSelectors();
             renderQueryRows();
+            await initializeOmniAuth();
         };
     </script>
 <div class="mt-8 text-center text-xs text-slate-500 border-t border-slate-900 pt-4">
     <i>Conceptualized by:</i> <b class="text-slate-400">Dr. Joydip Chandra, BRSC</b>
 </div>
+    </div><!-- /app-shell -->
 </body>
 </html>
