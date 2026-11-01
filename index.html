@@ -127,12 +127,16 @@
             <div id="auth-config-warning" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">Supabase is not configured yet. Add your project URL and publishable/anon key in the configuration section of this file before deployment.</div>
             <div id="auth-login-panel" class="space-y-3">
                 <h2 class="text-lg font-bold text-slate-800">Sign in</h2>
-                <form id="auth-login-form" class="space-y-3">
-                    <input id="login-email" type="email" autocomplete="email" required placeholder="Email address" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
-                    <input id="login-password" type="password" autocomplete="current-password" required placeholder="Password" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-sky-500">
-                    <button id="login-submit" class="w-full rounded-xl py-3 text-sm font-bold text-white bg-gradient-to-r from-sky-600 to-indigo-600">Sign in</button>
+                <button id="auth-google-button" type="button" class="w-full rounded-xl py-3 text-sm font-bold text-white bg-gradient-to-r from-sky-600 to-indigo-600">Continue with Google</button>
+                <form id="auth-login-form" class="hidden">
+                    <input id="login-email" type="email" autocomplete="email" required placeholder="Email address">
+                    <input id="login-password" type="password" autocomplete="current-password" required placeholder="Password">
+                    <button id="login-submit" type="submit">Sign in</button>
                 </form>
-                <div class="flex justify-between text-xs"><button id="show-forgot" class="text-sky-700 hover:underline" type="button">Forgot password?</button><button id="show-signup" class="text-sky-700 hover:underline" type="button">Create an account</button></div>
+                <div class="hidden">
+                    <button id="show-forgot" type="button"></button>
+                    <button id="show-signup" type="button"></button>
+                </div>
             </div>
             <div id="auth-signup-panel" class="hidden space-y-3">
                 <h2 class="text-lg font-bold text-slate-800">Create your account</h2>
@@ -576,6 +580,21 @@ Dr. Joydip Chandra</span>
             document.getElementById('show-forgot').onclick = () => showAuthPanel('forgot');
             document.getElementById('back-login-from-signup').onclick = () => showAuthPanel('login');
             document.getElementById('back-login-from-forgot').onclick = () => showAuthPanel('login');
+            document.getElementById('auth-google-button').addEventListener('click', async () => {
+                const button = document.getElementById('auth-google-button');
+                button.disabled = true;
+                button.classList.add('opacity-60', 'cursor-wait');
+                authMessage('Redirecting to Google…');
+                const { error } = await window.omniSupabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: location.origin + location.pathname }
+                });
+                if (error) {
+                    button.disabled = false;
+                    button.classList.remove('opacity-60', 'cursor-wait');
+                    authMessage(error.message, true);
+                }
+            });
             document.getElementById('auth-state-signout')?.addEventListener('click', async () => { await logOmniActivity('logout'); await window.omniSupabase.auth.signOut(); });
             window.omniSupabase.auth.onAuthStateChange((event, session) => {
                 if (event === 'PASSWORD_RECOVERY') { showAuthPanel('reset'); return; }
