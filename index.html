@@ -653,7 +653,6 @@
                 const button = document.getElementById('auth-google-button');
                 button.disabled = true;
                 button.classList.add('opacity-60', 'cursor-wait');
-                authMessage('Redirecting to Google…');
                 const { error } = await window.omniSupabase.auth.signInWithOAuth({
                     provider: 'google',
                     options: { redirectTo: location.origin + location.pathname }
