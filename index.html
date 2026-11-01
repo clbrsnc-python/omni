@@ -131,6 +131,22 @@
         #auth-screen input { background: #102747 !important; color: #f8fafc !important; border-color: #52647d !important; }
         #auth-screen input::placeholder { color: #b6c2d2 !important; }
         #auth-screen #auth-notice { color: #f8fafc; }
+
+        /* Mobile-only: give the login panel a larger, more balanced presence. */
+        @media (max-width: 640px) {
+            #auth-screen { padding: 12px !important; align-items: center !important; }
+            #auth-screen .omni-auth-card {
+                width: 94vw !important;
+                max-width: none !important;
+                min-height: 78svh;
+                padding: 26px 20px !important;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 16px !important;
+            }
+            #auth-screen .omni-brand-mark { height: 118px; width: min(100%, 220px); }
+        }
     </style>
     <meta name="google-site-verification" content="saLjcU2g9RJWMfI5BpgBeiT6dmypuT-lbnN3TY74nh4" />
 </head>
