@@ -112,8 +112,8 @@
 
         body.auth-locked { overflow: auto; }
         body.auth-initializing #auth-screen, body.auth-initializing #app-shell { display: none !important; }
-        #auth-screen { background: radial-gradient(ellipse at center, #0b3d78 0%, #06264f 58%, #031735 100%) !important; }
-        #auth-screen .omni-auth-card { background: linear-gradient(145deg,#1262ad 0%,#084b91 52%,#06366f 100%) !important; border: 5px solid #e6bd4e !important; box-shadow: 0 20px 55px rgba(0,0,0,.42), inset 0 0 0 2px rgba(255,235,165,.25), 0 0 26px rgba(230,189,78,.22) !important; color:#fff !important; }
+        #auth-screen { background: radial-gradient(ellipse at center, #1262ad 0%, #084b91 58%, #06366f 100%) !important; }
+        #auth-screen .omni-auth-card { background: linear-gradient(145deg,#071a33 0%,#0a2444 52%,#031329 100%) !important; border: 5px solid #e6bd4e !important; box-shadow: 0 20px 55px rgba(0,0,0,.42), inset 0 0 0 2px rgba(255,235,165,.25), 0 0 26px rgba(230,189,78,.22) !important; color:#fff !important; }
         #auth-screen .omni-brand-mark { width:min(100%,250px); height:145px; display:flex; align-items:center; justify-content:center; margin-bottom:2px; }
         #auth-screen .omni-brand-mark svg { width:100%; height:100%; overflow:visible; }
         #auth-screen .omni-brand-name { margin:0; color:#fff !important; font-family:Georgia,'Times New Roman',serif !important; font-size:clamp(36px,5vw,48px) !important; line-height:1.05; font-weight:700 !important; letter-spacing:.01em !important; text-shadow:0 2px 2px rgba(0,0,0,.2); }
@@ -149,22 +149,26 @@
         <div class="omni-auth-card w-full max-w-xl rounded-[28px] p-8 md:p-10 space-y-5 text-center">
             <div class="text-center space-y-3">
                 <div class="omni-brand-mark mx-auto" aria-label="OmniScholar academic emblem">
-                    <svg viewBox="0 0 360 210" role="img" aria-label="Golden graduation cap above an open book encircled by an orbital ring">
+                    <svg viewBox="0 0 240 150" role="img" aria-label="Academic graduation cap inside a tilted golden orbital ellipse">
                         <defs>
-                            <linearGradient id="omniGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a6"/><stop offset=".48" stop-color="#e8b936"/><stop offset="1" stop-color="#c58a16"/></linearGradient>
+                            <linearGradient id="capGold" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#fff4c2"/>
+                                <stop offset="0.52" stop-color="#e9c15b"/>
+                                <stop offset="1" stop-color="#c18a24"/>
+                            </linearGradient>
                         </defs>
-                        <ellipse cx="180" cy="110" rx="160" ry="58" transform="rotate(-17 180 110)" fill="none" stroke="url(#omniGold)" stroke-width="7"/>
-                        <path d="M55 111 L180 169 L305 111 L180 55 Z" fill="url(#omniGold)" stroke="#ffdf78" stroke-width="3" stroke-linejoin="round"/>
-                        <path d="M75 112 L180 160 L285 112" fill="none" stroke="#fff0a6" stroke-width="4"/>
-                        <path d="M92 105 L180 145 L268 105 L180 67 Z" fill="#07519a" stroke="#e9bd4e" stroke-width="3"/>
-                        <path d="M95 118 Q135 105 180 150 Q225 105 265 118 L265 145 Q224 132 180 174 Q136 132 95 145 Z" fill="url(#omniGold)" stroke="#ffdf78" stroke-width="3"/>
-                        <path d="M180 150 L180 174" stroke="#fff2b4" stroke-width="3"/>
-                        <path d="M180 55 L180 25" stroke="#f6d36b" stroke-width="4"/>
-                        <path d="M180 25 L318 40" stroke="#f6d36b" stroke-width="3" stroke-linecap="round"/>
-                        <path d="M318 40 Q332 76 312 102" fill="none" stroke="#f6d36b" stroke-width="3"/>
-                        <path d="M180 25 L180 8 L260 28 L180 48 L100 28 Z" fill="url(#omniGold)" stroke="#fff0a6" stroke-width="2.5" stroke-linejoin="round"/>
-                        <path d="M260 28 L260 85" stroke="#f6d36b" stroke-width="3"/>
-                        <path d="M254 85 Q260 96 266 85 L263 111 L257 111 Z" fill="url(#omniGold)"/>
+                        <ellipse cx="120" cy="75" rx="105" ry="43" transform="rotate(-24 120 75)"
+                                 fill="none" stroke="url(#capGold)" stroke-width="5.5"/>
+                        <path d="M17 89 Q34 119 67 126" fill="none" stroke="#f5d77e" stroke-width="2.2" stroke-linecap="round"/>
+                        <path d="M218 60 Q205 34 179 24" fill="none" stroke="#f5d77e" stroke-width="2.2" stroke-linecap="round"/>
+                        <path d="M120 37 L185 67 L120 98 L55 67 Z"
+                              fill="url(#capGold)" stroke="#fff0b0" stroke-width="2.5" stroke-linejoin="round"/>
+                        <path d="M82 80 L82 101 Q120 126 158 101 L158 80 L120 99 Z"
+                              fill="#f4d783" stroke="#c18a24" stroke-width="2.2" stroke-linejoin="round"/>
+                        <path d="M185 67 L185 105" fill="none" stroke="#f5d77e" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M179 105 Q185 116 191 105 L188 123 L182 123 Z"
+                              fill="url(#capGold)" stroke="#d4a63d" stroke-width="1.2"/>
+                        <circle cx="17" cy="89" r="4" fill="#fff0b0"/>
                     </svg>
                 </div>
                 <h1 class="omni-brand-name"><span>Omni</span><strong>Scholar</strong></h1>
