@@ -111,10 +111,19 @@
         .cit-tab.cit-inactive { background: #f0fdfa !important; color: #475569 !important; }
 
         body.auth-locked { overflow: auto; }
+        body.auth-initializing #auth-screen, body.auth-initializing #app-shell { display: none !important; }
     </style>
     <meta name="google-site-verification" content="saLjcU2g9RJWMfI5BpgBeiT6dmypuT-lbnN3TY74nh4" />
 </head>
-<body class="h-full flex flex-col font-sans bg-sky-50 text-slate-900 antialiased selection:bg-sky-200 selection:text-slate-900 auth-locked">
+<body class="h-full flex flex-col font-sans bg-sky-50 text-slate-900 antialiased selection:bg-sky-200 selection:text-slate-900 auth-locked auth-initializing">
+
+    <!-- Brief neutral screen while Supabase restores/checks the saved session. -->
+    <section id="auth-loading-screen" class="min-h-screen w-full flex items-center justify-center p-4 bg-sky-50">
+        <div class="text-center text-slate-600">
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600"></div>
+            <p class="mt-3 text-sm font-medium">Checking your secure session…</p>
+        </div>
+    </section>
 
     <!-- Authentication gate: shown before the unchanged OmniScholar workspace. -->
     <section id="auth-screen" class="min-h-screen w-full flex items-center justify-center p-4 bg-sky-50">
@@ -544,6 +553,8 @@
             const configured = window.supabase && OMNI_SUPABASE_URL.startsWith('https://') && !OMNI_SUPABASE_URL.includes('YOUR_') && OMNI_SUPABASE_ANON_KEY && !OMNI_SUPABASE_ANON_KEY.includes('YOUR_');
             if (!configured) {
                 document.getElementById('auth-config-warning').classList.remove('hidden');
+                document.getElementById('auth-loading-screen').classList.add('hidden');
+                document.body.classList.remove('auth-initializing');
                 return;
             }
             window.omniSupabase = window.supabase.createClient(OMNI_SUPABASE_URL, OMNI_SUPABASE_ANON_KEY, {
@@ -613,6 +624,8 @@
             const { data: { session } } = await window.omniSupabase.auth.getSession();
             if (session?.user?.email_confirmed_at) await enterOmniWorkspace(session.user);
             else if (session) { await window.omniSupabase.auth.signOut(); authMessage('Please verify your email before accessing OmniScholar.', true); }
+            document.getElementById('auth-loading-screen').classList.add('hidden');
+            document.body.classList.remove('auth-initializing');
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
