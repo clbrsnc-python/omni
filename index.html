@@ -112,6 +112,21 @@
 
         body.auth-locked { overflow: auto; }
         body.auth-initializing #auth-screen, body.auth-initializing #app-shell { display: none !important; }
+        #auth-screen { background: radial-gradient(ellipse at center, #0b3d78 0%, #06264f 58%, #031735 100%) !important; }
+        #auth-screen .omni-auth-card { background: linear-gradient(145deg,#1262ad 0%,#084b91 52%,#06366f 100%) !important; border: 5px solid #e6bd4e !important; box-shadow: 0 20px 55px rgba(0,0,0,.42), inset 0 0 0 2px rgba(255,235,165,.25), 0 0 26px rgba(230,189,78,.22) !important; color:#fff !important; }
+        #auth-screen .omni-brand-mark { width:min(100%,250px); height:145px; display:flex; align-items:center; justify-content:center; margin-bottom:2px; }
+        #auth-screen .omni-brand-mark svg { width:100%; height:100%; overflow:visible; }
+        #auth-screen .omni-brand-name { margin:0; color:#fff !important; font-family:Georgia,'Times New Roman',serif !important; font-size:clamp(36px,5vw,48px) !important; line-height:1.05; font-weight:700 !important; letter-spacing:.01em !important; text-shadow:0 2px 2px rgba(0,0,0,.2); }
+        #auth-screen .omni-brand-name strong { color:#ffdc79 !important; font-weight:700 !important; }
+        #auth-screen .omni-brand-subtitle { color:#e5efff !important; font-family:Georgia,'Times New Roman',serif !important; font-size:14px !important; letter-spacing:.08em; }
+        #auth-screen h2 { color:#fff !important; font-family:Georgia,'Times New Roman',serif !important; font-size:20px !important; }
+        #auth-screen #auth-google-button { min-height:62px; border:2px solid #e6bd4e !important; border-radius:14px !important; font-family:Arial,sans-serif; font-size:17px !important; }
+        #auth-screen input { background:#f8fbff !important; color:#172b45 !important; border-color:#d7e3f3 !important; }
+        #auth-screen input::placeholder { color:#65758b !important; }
+        #auth-screen .omni-auth-credit { border-top:1px solid rgba(255,231,166,.35); margin-top:22px; padding-top:18px; }
+        #auth-screen .omni-auth-credit p { margin:0; color:#dceaff !important; font-family:Georgia,'Times New Roman',serif !important; font-size:14px !important; font-style:italic; letter-spacing:.025em; }
+        #auth-screen .omni-auth-credit strong { display:block; margin-top:4px; color:#ffdc79 !important; font-family:Georgia,'Times New Roman',serif !important; font-size:18px !important; font-weight:700; }
+        #auth-screen #auth-notice { color:#fff !important; }
         #auth-screen h2 { color: #f8fafc !important; }
         #auth-screen input { background: #102747 !important; color: #f8fafc !important; border-color: #52647d !important; }
         #auth-screen input::placeholder { color: #b6c2d2 !important; }
@@ -131,21 +146,29 @@
 
     <!-- Authentication gate: shown before the unchanged OmniScholar workspace. -->
     <section id="auth-screen" class="min-h-screen w-full flex items-center justify-center p-4 bg-sky-50">
-        <div class="w-full max-w-md bg-[#071a33] border border-[#b89549]/50 rounded-2xl shadow-2xl p-7 space-y-5">
-            <div class="text-center space-y-2">
-                <div class="relative inline-flex items-center justify-center w-16 h-16 rounded-full border border-[#d4af62]/60 bg-[#102747] shadow-lg shadow-black/30">
-                    <svg viewBox="0 0 64 64" class="w-11 h-11" aria-hidden="true">
-                        <ellipse cx="32" cy="32" rx="28" ry="12" fill="none" stroke="#d4af62" stroke-width="1.8" transform="rotate(-28 32 32)"/>
-                        <path d="M10 25 L32 14 L54 25 L32 36 Z" fill="#f8fafc" stroke="#d4af62" stroke-width="1.4"/>
-                        <path d="M19 30 V40 Q32 49 45 40 V30 L32 37 Z" fill="#e5e7eb" stroke="#d4af62" stroke-width="1.2"/>
-                        <path d="M52 25 V39" stroke="#d4af62" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="52" cy="41" r="2.5" fill="#d4af62"/>
-                        <circle cx="10" cy="25" r="2" fill="#d4af62"/>
+        <div class="omni-auth-card w-full max-w-xl rounded-[28px] p-8 md:p-10 space-y-5 text-center">
+            <div class="text-center space-y-3">
+                <div class="omni-brand-mark mx-auto" aria-label="OmniScholar academic emblem">
+                    <svg viewBox="0 0 360 210" role="img" aria-label="Golden graduation cap above an open book encircled by an orbital ring">
+                        <defs>
+                            <linearGradient id="omniGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a6"/><stop offset=".48" stop-color="#e8b936"/><stop offset="1" stop-color="#c58a16"/></linearGradient>
+                        </defs>
+                        <ellipse cx="180" cy="110" rx="160" ry="58" transform="rotate(-17 180 110)" fill="none" stroke="url(#omniGold)" stroke-width="7"/>
+                        <path d="M55 111 L180 169 L305 111 L180 55 Z" fill="url(#omniGold)" stroke="#ffdf78" stroke-width="3" stroke-linejoin="round"/>
+                        <path d="M75 112 L180 160 L285 112" fill="none" stroke="#fff0a6" stroke-width="4"/>
+                        <path d="M92 105 L180 145 L268 105 L180 67 Z" fill="#07519a" stroke="#e9bd4e" stroke-width="3"/>
+                        <path d="M95 118 Q135 105 180 150 Q225 105 265 118 L265 145 Q224 132 180 174 Q136 132 95 145 Z" fill="url(#omniGold)" stroke="#ffdf78" stroke-width="3"/>
+                        <path d="M180 150 L180 174" stroke="#fff2b4" stroke-width="3"/>
+                        <path d="M180 55 L180 25" stroke="#f6d36b" stroke-width="4"/>
+                        <path d="M180 25 L318 40" stroke="#f6d36b" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M318 40 Q332 76 312 102" fill="none" stroke="#f6d36b" stroke-width="3"/>
+                        <path d="M180 25 L180 8 L260 28 L180 48 L100 28 Z" fill="url(#omniGold)" stroke="#fff0a6" stroke-width="2.5" stroke-linejoin="round"/>
+                        <path d="M260 28 L260 85" stroke="#f6d36b" stroke-width="3"/>
+                        <path d="M254 85 Q260 96 266 85 L263 111 L257 111 Z" fill="url(#omniGold)"/>
                     </svg>
                 </div>
-                <h1 class="text-3xl font-extrabold tracking-tight"><span class="text-white">Omni</span><span class="text-[#e0bd70]">Scholar</span></h1>
-                <p class="text-xs text-slate-300">Scholarly Search & Citation Engine</p>
-
+                <h1 class="omni-brand-name"><span>Omni</span><strong>Scholar</strong></h1>
+                <p class="omni-brand-subtitle">Scholarly Search &amp; Citation Engine</p>
             </div>
             <div id="auth-notice" class="hidden rounded-xl p-3 text-xs" role="status" aria-live="polite"></div>
             <div id="auth-config-warning" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">Supabase is not configured yet. Add your project URL and publishable/anon key in the configuration section of this file before deployment.</div>
@@ -197,9 +220,9 @@
                 </form>
             </div>
             <p class="text-[10px] text-center text-slate-400">Secure account access powered by Supabase</p>
-            <div class="pt-3 mt-2 border-t border-white/10 text-center">
-                <p class="text-xs text-slate-400/70">Conceptualized and developed by</p>
-                <p class="mt-1 text-sm font-bold tracking-wide text-[#e0bd70]">Dr. Joydip Chandra</p>
+            <div class="omni-auth-credit">
+                <p>Conceptualized and developed by</p>
+                <strong>Dr. Joydip Chandra</strong>
             </div>
         </div>
     </section>
