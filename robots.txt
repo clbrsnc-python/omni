@@ -1,0 +1,14 @@
+
+User-agent: *
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://clbrsnc-python.github.io/omni/sitemap.xml
