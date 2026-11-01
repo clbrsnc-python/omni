@@ -145,14 +145,21 @@
                 </div>
                 <h1 class="text-3xl font-extrabold tracking-tight"><span class="text-white">Omni</span><span class="text-[#e0bd70]">Scholar</span></h1>
                 <p class="text-xs text-slate-300">Scholarly Search & Citation Engine</p>
-                <p class="pt-2 text-xs text-slate-300">Conceptualized and developed by</p>
-                <p class="text-sm font-bold tracking-wide text-[#e0bd70]">Dr. Joydip Chandra</p>
+
             </div>
             <div id="auth-notice" class="hidden rounded-xl p-3 text-xs" role="status" aria-live="polite"></div>
             <div id="auth-config-warning" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">Supabase is not configured yet. Add your project URL and publishable/anon key in the configuration section of this file before deployment.</div>
             <div id="auth-login-panel" class="space-y-3">
                 <h2 class="text-lg font-bold text-slate-800">Sign in</h2>
-                <button id="auth-google-button" type="button" class="w-full rounded-xl py-3 text-sm font-bold text-white bg-gradient-to-r from-sky-600 to-indigo-600">Continue with Google</button>
+                <button id="auth-google-button" type="button" class="w-full flex items-center justify-center gap-3 rounded-xl border border-[#d8b65b] bg-white py-3 text-sm font-bold text-slate-800 shadow-md hover:bg-[#fffdf6]">
+                    <svg viewBox="0 0 48 48" class="h-6 w-6" aria-hidden="true">
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.74 7.18l7.28 5.65c4.25-3.92 7.5-9.7 7.5-17.3z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.28-5.65c-2.02 1.35-4.6 2.15-8.62 2.15-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.53 13.22l7.98 6.19C12.4 13.72 17.71 9.5 24 9.5z"/>
+                    </svg>
+                    <span>Continue with <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span></span>
+                </button>
                 <form id="auth-login-form" class="hidden">
                     <input id="login-email" type="email" autocomplete="email" required placeholder="Email address">
                     <input id="login-password" type="password" autocomplete="current-password" required placeholder="Password">
@@ -190,6 +197,10 @@
                 </form>
             </div>
             <p class="text-[10px] text-center text-slate-400">Secure account access powered by Supabase</p>
+            <div class="pt-3 mt-2 border-t border-white/10 text-center">
+                <p class="text-xs text-slate-400/70">Conceptualized and developed by</p>
+                <p class="mt-1 text-sm font-bold tracking-wide text-[#e0bd70]">Dr. Joydip Chandra</p>
+            </div>
         </div>
     </section>
     <div id="app-shell" class="hidden">
