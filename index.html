@@ -112,7 +112,17 @@
 
         body.auth-locked { overflow: auto; }
         body.auth-initializing #auth-screen, body.auth-initializing #app-shell { display: none !important; }
-        #auth-screen { background: radial-gradient(ellipse at center, #1262ad 0%, #084b91 58%, #06366f 100%) !important; }
+        #auth-screen {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100svh;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: radial-gradient(ellipse at center, #1262ad 0%, #084b91 58%, #06366f 100%) !important;
+        }
         #auth-screen .omni-auth-card { background: linear-gradient(145deg,#071a33 0%,#0a2444 52%,#031329 100%) !important; border: 5px solid #e6bd4e !important; box-shadow: 0 20px 55px rgba(0,0,0,.42), inset 0 0 0 2px rgba(255,235,165,.25), 0 0 26px rgba(230,189,78,.22) !important; color:#fff !important; }
         #auth-screen .omni-brand-mark { width:min(100%,250px); height:145px; display:flex; align-items:center; justify-content:center; margin-bottom:2px; }
         #auth-screen .omni-brand-mark svg { width:100%; height:100%; overflow:visible; }
@@ -134,15 +144,27 @@
 
         /* Mobile-only: give the login panel a larger, more balanced presence. */
         @media (max-width: 640px) {
-            #auth-screen { padding: 12px !important; align-items: center !important; }
+            #auth-screen {
+                display: flex !important;
+                width: 100% !important;
+                min-height: 100vh !important;
+                min-height: 100svh !important;
+                box-sizing: border-box !important;
+                padding: 12px !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
             #auth-screen .omni-auth-card {
+                box-sizing: border-box !important;
+                flex: 0 0 auto !important;
                 width: 94vw !important;
                 max-width: none !important;
-                min-height: 78svh;
+                min-height: 78vh !important;
+                min-height: 78svh !important;
                 padding: 26px 20px !important;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
                 gap: 16px !important;
             }
             #auth-screen .omni-brand-mark { height: 118px; width: min(100%, 220px); }
