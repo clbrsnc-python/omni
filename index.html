@@ -113,7 +113,6 @@
         body.auth-locked { overflow: auto; }
         body.auth-initializing #auth-screen, body.auth-initializing #app-shell { display: none !important; }
         #auth-screen {
-            display: flex;
             width: 100%;
             min-height: 100vh;
             min-height: 100svh;
@@ -144,8 +143,10 @@
 
         /* Mobile-only: give the login panel a larger, more balanced presence. */
         @media (max-width: 640px) {
-            #auth-screen {
+            #auth-screen:not(.hidden) {
                 display: flex !important;
+            }
+            #auth-screen {
                 width: 100% !important;
                 min-height: 100vh !important;
                 min-height: 100svh !important;
